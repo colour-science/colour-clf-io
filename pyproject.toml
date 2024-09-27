@@ -1,0 +1,200 @@
+[tool.poetry]
+name = "colour-clf-io"
+version = "0.1.0"
+description = "Library to parse and create file in the Common LUT format"
+authors = ["Colour Developers <colour-developers@colour-science.org>"]
+maintainers = ["Colour Developers <colour-developers@colour-science.org>"]
+license = "BSD-3-Clause"
+readme = "README.rst"
+repository = "https://github.com/colour-science/colour_clf_io"
+homepage = "https://www.colour-science.org/"
+keywords = [
+    "color",
+    "color-science",
+    "color-space",
+    "color-spaces",
+    "colorspace",
+    "colorspaces",
+    "colour",
+    "colour-science",
+    "colour-space",
+    "colour-spaces",
+    "colourspace",
+    "colourspaces",
+    "python",
+    "CLF",
+    "common lut format"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+]
+
+
+[tool.poetry.dependencies]
+python = ">= 3.9, < 3.13"
+numpy = ">= 1.22, < 2"
+typing-extensions = ">= 4, < 5"
+lxml = "^5.2.1"
+lxml-stubs = "^0.5.1"
+
+[tool.poetry.group.dev.dependencies]
+coverage = ">= 6, < 7"
+coveralls = "*"
+invoke = "*"
+pre-commit = ">= 3.5"
+pyright = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
+toml = "*"
+twine = "*"
+
+[tool.poetry.group.optional.dependencies]
+opencolorio = ">= 2, < 3"
+
+[tool.poetry.group.docs.dependencies]
+biblib-simple = "*"
+pydata-sphinx-theme = "*"
+restructuredtext-lint = "*"
+sphinx = "*"
+sphinxcontrib-bibtex = "*"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+
+[tool.codespell]
+ignore-words-list = 'co-ordinates,exitance,hart,ist'
+skip = 'BIBLIOGRAPHY.bib,CONTRIBUTORS.rst'
+
+[tool.flynt]
+line_length = 999
+
+[tool.isort]
+ensure_newline_before_comments = true
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+skip_glob = ["colour/**/__init__.py"]
+split_on_trailing_comma = true
+use_parentheses = true
+
+[tool.pyright]
+reportMissingImports = false
+reportMissingModuleSource = false
+reportUnboundVariable = false
+reportUnnecessaryCast = true
+reportUnnecessaryTypeIgnorComment = true
+reportUnsupportedDunderAll = false
+reportUnusedExpression = false
+
+
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+lint.select = [
+    "A", # flake8-builtins
+    "ARG", # flake8-unused-arguments
+    # "ANN", # flake8-annotations
+    "B", # flake8-bugbear
+    # "BLE", # flake8-blind-except
+    "C4", # flake8-comprehensions
+    # "C90", # mccabe
+    # "COM", # flake8-commas
+    "DTZ", # flake8-datetimez
+    "D", # pydocstyle
+    "E", # pydocstyle
+    # "ERA", # eradicate
+    # "EM", # flake8-errmsg
+    "EXE", # flake8-executable
+    "F", # flake8
+    # "FBT", # flake8-boolean-trap
+    "G", # flake8-logging-format
+    "I", # isort
+    "ICN", # flake8-import-conventions
+    "INP", # flake8-no-pep420
+    "ISC", # flake8-implicit-str-concat
+    "N", # pep8-naming
+    # "PD", # pandas-vet
+    "PIE", # flake8-pie
+    "PGH", # pygrep-hooks
+    "PL", # pylint
+    # "PT", # flake8-pytest-style
+    # "PTH", # flake8-use-pathlib [Enable]
+    "Q",   # flake8-quotes
+    "RET", # flake8-return
+    "RUF", # Ruff
+    "S", # flake8-bandit
+    "SIM", # flake8-simplify
+    "T10", # flake8-debugger
+    "T20", # flake8-print
+    # "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "TRY", # tryceratops
+    "UP", # pyupgrade
+    "W", # pydocstyle
+    "YTT", # flake8-2020
+]
+lint.ignore = [
+    "B008",
+    "B905",
+    "D104",
+    "D200",
+    "D202",
+    "D205",
+    "D301",
+    "D400",
+    "I001",
+    "N801",
+    "N802",
+    "N803",
+    "N806",
+    "N813",
+    "N815",
+    "N816",
+    "PGH003",
+    "PIE804",
+    "PLE0605",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR2004",
+    "RET504",
+    "RET505",
+    "RET506",
+    "RET507",
+    "RET508",
+    "TRY003",
+    "TRY300",
+]
+lint.typing-modules = ["colour.hints"]
+lint.fixable = ["B", "C", "E", "F", "PIE", "RUF", "SIM", "UP", "W"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"colour/examples/*" = ["INP", "T201", "T203"]
+"docs/*" = ["INP"]
+"tasks.py" = ["INP"]
+"utilities/*" = ["EXE001", "INP"]
+"utilities/unicode_to_ascii.py" = ["RUF001"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
