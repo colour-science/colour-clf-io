@@ -28,6 +28,8 @@ from colour_clf_io.parsing import (
     ParserConfig,
     XMLParsable,
     child_element,
+    child_elements,
+    element_as_float,
     element_as_text,
     map_optional,
     retrieve_attributes,
@@ -377,10 +379,13 @@ class Range(ProcessNode):
 
         super_args = ProcessNode.parse_attributes(xml, config)
 
-        min_in_value = float(element_as_text(xml, "minInValue", config))
-        max_in_value = float(element_as_text(xml, "maxInValue", config))
-        min_out_value = float(element_as_text(xml, "minOutValue", config))
-        max_out_value = float(element_as_text(xml, "maxOutValue", config))
+        def optional_float(name):
+            return element_as_float(xml, name, config)
+
+        min_in_value = optional_float("minInValue")
+        max_in_value = optional_float("maxInValue")
+        min_out_value = optional_float("minOutValue")
+        max_out_value = optional_float("maxOutValue")
 
         style = map_optional(RangeStyle, xml.get("style"))
 
@@ -405,7 +410,7 @@ class Log(ProcessNode):
     """
 
     style: LogStyle
-    log_params: LogParams | None
+    log_params: list[LogParams]
 
     @staticmethod
     @register_process_node_xml_constructor("Log")
@@ -428,10 +433,16 @@ class Log(ProcessNode):
             return None
         super_args = ProcessNode.parse_attributes(xml, config)
         style = LogStyle(xml.get("style"))
-        param_element = child_element(xml, "LogParams", config)
-        log_params = LogParams.from_xml(param_element, config)
-
-        return Log(style=style, log_params=log_params, **super_args)
+        param_elements = child_elements(xml, "LogParams", config)
+        params = [
+            param
+            for param in [
+                LogParams.from_xml(param_element, config)
+                for param_element in param_elements
+            ]
+            if param is not None
+        ]
+        return Log(style=style, log_params=params, **super_args)
 
 
 @dataclass
@@ -445,7 +456,7 @@ class Exponent(ProcessNode):
     """
 
     style: ExponentStyle
-    exponent_params: ExponentParams | None
+    exponent_params: list[ExponentParams]
 
     @staticmethod
     @register_process_node_xml_constructor("Exponent")
@@ -470,9 +481,18 @@ class Exponent(ProcessNode):
         style = map_optional(ExponentStyle, xml.get("style"))
         if style is None:
             raise ParsingError("Exponent process node has no `style' value.")
-        param_element = child_element(xml, "ExponentParams", config)
-        log_params = ExponentParams.from_xml(param_element, config)
-        return Exponent(style=style, exponent_params=log_params, **super_args)
+        param_elements = child_elements(xml, "ExponentParams", config)
+        params = [
+            param
+            for param in [
+                ExponentParams.from_xml(param_element, config)
+                for param_element in param_elements
+            ]
+            if param is not None
+        ]
+        if not params:
+            raise ParsingError("Exponent process node has no `ExponentParams' element.")
+        return Exponent(style=style, exponent_params=params, **super_args)
 
 
 @dataclass

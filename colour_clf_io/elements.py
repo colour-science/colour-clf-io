@@ -12,6 +12,7 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 
+import numpy.typing as npt
 from typing_extensions import Self
 
 from colour_clf_io.errors import ParsingError
@@ -34,7 +35,7 @@ __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
-__ALL__ = [
+__all__ = [
     "Array",
     "CalibrationInfo",
     "RangeStyle",
@@ -84,7 +85,7 @@ class Array(XMLParsable):
         values = list(map(float, xml.text.split()))
         return cls(values=values, dim=dim)
 
-    def as_array(self):
+    def as_array(self) -> npt.ArrayLike:
         """
         Convert the CLF element into a numpy array.
 

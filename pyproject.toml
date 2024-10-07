@@ -1,13 +1,16 @@
-[tool.poetry]
+[project]
 name = "colour-clf-io"
 version = "0.1.0"
 description = "Library to parse and create file in the Common LUT format"
-authors = ["Colour Developers <colour-developers@colour-science.org>"]
-maintainers = ["Colour Developers <colour-developers@colour-science.org>"]
-license = "BSD-3-Clause"
 readme = "README.rst"
-repository = "https://github.com/colour-science/colour_clf_io"
-homepage = "https://www.colour-science.org/"
+requires-python = ">=3.10,<3.14"
+authors = [
+    { name = "Colour Developers", email = "colour-developers@colour-science.org" },
+]
+maintainers = [
+    { name = "Colour Developers", email = "colour-developers@colour-science.org" }
+]
+license = { text = "BSD-3-Clause" }
 keywords = [
     "color",
     "color-science",
@@ -38,39 +41,47 @@ classifiers = [
     "Topic :: Software Development",
 ]
 
-
-[tool.poetry.dependencies]
-python = ">= 3.9, < 3.13"
-numpy = ">= 1.22, < 2"
-typing-extensions = ">= 4, < 5"
-lxml = "^5.2.1"
-lxml-stubs = "^0.5.1"
-
-[tool.poetry.group.dev.dependencies]
-coverage = ">= 6, < 7"
-coveralls = "*"
-invoke = "*"
-pre-commit = ">= 3.5"
-pyright = "*"
-pytest = "*"
-pytest-cov = "*"
-pytest-xdist = "*"
-toml = "*"
-twine = "*"
-
-[tool.poetry.group.optional.dependencies]
-opencolorio = ">= 2, < 3"
-
-[tool.poetry.group.docs.dependencies]
-biblib-simple = "*"
-pydata-sphinx-theme = "*"
-restructuredtext-lint = "*"
-sphinx = "*"
-sphinxcontrib-bibtex = "*"
+dependencies = [
+    "numpy>=1.24,<3",
+    "typing-extensions>=4,<5",
+    "lxml>=5.2.1,<6",
+    "lxml-stubs>=0.5.1,<0.6"
+]
 
 
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.3"
+[project.optional-dependencies]
+docs = [
+    "biblib-simple",
+    "pydata-sphinx-theme",
+    "restructuredtext-lint",
+    "sphinx",
+    "sphinxcontrib-bibtex",
+]
+
+
+[tool.uv]
+package = true
+dev-dependencies = [
+    "coverage",
+    "coveralls",
+    "hatch",
+    "invoke",
+    "jupyter",
+    "pre-commit",
+    "pyright",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+    "toml",
+    "twine",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "colour-clf-io" ]
 
 [tool.codespell]
 ignore-words-list = 'co-ordinates,exitance,hart,ist'
@@ -179,14 +190,12 @@ lint.ignore = [
     "TRY003",
     "TRY300",
 ]
-lint.typing-modules = ["colour.hints"]
 lint.fixable = ["B", "C", "E", "F", "PIE", "RUF", "SIM", "UP", "W"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
-"colour/examples/*" = ["INP", "T201", "T203"]
 "docs/*" = ["INP"]
 "tasks.py" = ["INP"]
 "utilities/*" = ["EXE001", "INP"]
@@ -195,6 +204,6 @@ convention = "numpy"
 [tool.ruff.format]
 docstring-code-format = true
 
-[build-system]
-requires = ["poetry_core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+
+[tool.setuptools]
+packages = ["colour_clf_io"]

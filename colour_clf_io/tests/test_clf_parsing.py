@@ -6,14 +6,13 @@ import unittest
 
 import numpy as np
 import pytest
+from test_clf_common import wrap_snippet
 
 import colour_clf_io.elements
 import colour_clf_io.process_nodes
 import colour_clf_io.values
 from colour_clf_io import parse_clf, read_clf
 from colour_clf_io.errors import ParsingError
-
-from .test_clf_common import wrap_snippet
 
 __author__ = "Colour Developers"
 __copyright__ = "Copyright 2013 Colour Developers"
@@ -294,7 +293,7 @@ class TestParseCLF(unittest.TestCase):
         self.assertEqual(node.out_bit_depth, colour_clf_io.values.BitDepth.f16)
         self.assertEqual(node.description, "Base 10 Logarithm")
         self.assertEqual(node.style, colour_clf_io.elements.LogStyle.LOG_10)
-        self.assertEqual(node.log_params, None)
+        self.assertEqual(node.log_params, [])
 
     def test_log_example_2(self):
         """
@@ -318,13 +317,13 @@ class TestParseCLF(unittest.TestCase):
         self.assertEqual(node.out_bit_depth, colour_clf_io.values.BitDepth.f32)
         self.assertEqual(node.description, "Linear to DJI D-Log")
         self.assertEqual(node.style, colour_clf_io.elements.LogStyle.CAMERA_LIN_TO_LOG)
-        self.assertAlmostEqual(node.log_params.base, 10.0)
-        self.assertAlmostEqual(node.log_params.log_side_slope, 0.256663)
-        self.assertAlmostEqual(node.log_params.log_side_offset, 0.584555)
-        self.assertAlmostEqual(node.log_params.lin_side_slope, 0.9892)
-        self.assertAlmostEqual(node.log_params.lin_side_offset, 0.0108)
-        self.assertAlmostEqual(node.log_params.lin_side_break, 0.0078)
-        self.assertAlmostEqual(node.log_params.linear_slope, 6.025)
+        self.assertAlmostEqual(node.log_params[0].base, 10.0)
+        self.assertAlmostEqual(node.log_params[0].log_side_slope, 0.256663)
+        self.assertAlmostEqual(node.log_params[0].log_side_offset, 0.584555)
+        self.assertAlmostEqual(node.log_params[0].lin_side_slope, 0.9892)
+        self.assertAlmostEqual(node.log_params[0].lin_side_offset, 0.0108)
+        self.assertAlmostEqual(node.log_params[0].lin_side_break, 0.0078)
+        self.assertAlmostEqual(node.log_params[0].linear_slope, 6.025)
 
     def test_exponent_example_1(self):
         """
@@ -346,7 +345,7 @@ class TestParseCLF(unittest.TestCase):
         self.assertEqual(node.out_bit_depth, colour_clf_io.values.BitDepth.f32)
         self.assertEqual(node.description, "Basic 2.2 Gamma")
         self.assertEqual(node.style, colour_clf_io.elements.ExponentStyle.BASIC_FWD)
-        self.assertAlmostEqual(node.exponent_params.exponent, 2.2)
+        self.assertAlmostEqual(node.exponent_params[0].exponent, 2.2)
 
     def test_exponent_example_2(self):
         """
@@ -368,8 +367,8 @@ class TestParseCLF(unittest.TestCase):
         self.assertEqual(node.out_bit_depth, colour_clf_io.values.BitDepth.f32)
         self.assertEqual(node.description, "EOTF (sRGB)")
         self.assertEqual(node.style, colour_clf_io.elements.ExponentStyle.MON_CURVE_FWD)
-        self.assertAlmostEqual(node.exponent_params.exponent, 2.4)
-        self.assertAlmostEqual(node.exponent_params.offset, 0.055)
+        self.assertAlmostEqual(node.exponent_params[0].exponent, 2.4)
+        self.assertAlmostEqual(node.exponent_params[0].offset, 0.055)
 
     def test_exponent_example_3(self):
         """
@@ -391,8 +390,8 @@ class TestParseCLF(unittest.TestCase):
         self.assertEqual(node.out_bit_depth, colour_clf_io.values.BitDepth.f32)
         self.assertEqual(node.description, "CIE L*")
         self.assertEqual(node.style, colour_clf_io.elements.ExponentStyle.MON_CURVE_REV)
-        self.assertAlmostEqual(node.exponent_params.exponent, 3.0)
-        self.assertAlmostEqual(node.exponent_params.offset, 0.16)
+        self.assertAlmostEqual(node.exponent_params[0].exponent, 3.0)
+        self.assertAlmostEqual(node.exponent_params[0].offset, 0.16)
 
     def test_exponent_example_4(self):
         """
@@ -414,8 +413,8 @@ class TestParseCLF(unittest.TestCase):
         self.assertEqual(node.out_bit_depth, colour_clf_io.values.BitDepth.f32)
         self.assertEqual(node.description, "Rec. 709 OETF")
         self.assertEqual(node.style, colour_clf_io.elements.ExponentStyle.MON_CURVE_REV)
-        self.assertAlmostEqual(node.exponent_params.exponent, 2.2222222222222222)
-        self.assertAlmostEqual(node.exponent_params.offset, 0.099)
+        self.assertAlmostEqual(node.exponent_params[0].exponent, 2.2222222222222222)
+        self.assertAlmostEqual(node.exponent_params[0].offset, 0.099)
 
     def test_ASC_CDL_example(self):
         """
@@ -597,9 +596,10 @@ class TestParseCLF(unittest.TestCase):
         self.assertIsNotNone(
             node.log_params, "Log Params were not parsed successfully."
         )
-        self.assertAlmostEqual(node.log_params.base, ocio_transform[0].getBase())
+        self.assertAlmostEqual(node.log_params[0].base, ocio_transform[0].getBase())
         self.assertAlmostEqual(
-            node.log_params.log_side_slope, ocio_transform[0].getLogSideSlopeValue()[0]
+            node.log_params[0].log_side_slope,
+            ocio_transform[0].getLogSideSlopeValue()[0],
         )
 
 

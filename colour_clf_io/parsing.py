@@ -36,11 +36,13 @@ __ALL__ = [
     "retrieve_attributes_as_float",
     "must_have",
     "child_element",
+    "child_elements",
     "child_element_or_exception",
     "element_as_text",
     "elements_as_text_list",
     "sliding_window",
     "three_floats",
+    "element_as_float",
 ]
 
 _T = TypeVar("_T")
@@ -240,13 +242,7 @@ def child_element(
 
     """
 
-    if config.clf_namespace_prefix_mapping():
-        elements = xml.xpath(
-            f"clf:{name}{xpath_function}",
-            namespaces=config.clf_namespace_prefix_mapping(),
-        )
-    else:
-        elements = xml.xpath(f"{name}{xpath_function}")
+    elements = child_elements(xml, name, config, xpath_function)
     element_count = len(elements)
     if element_count == 0:
         return None
@@ -257,6 +253,40 @@ def child_element(
             f"Found multiple elements of type {name} in "
             f"element {xml}, but only expected exactly one."
         )
+
+
+def child_elements(
+    xml, name, config: ParserConfig, xpath_function=""
+) -> list[xml.etree.ElementTree.Element] | list[str]:
+    """
+    Return all child elements with a given name of an XML element.
+
+    Parameters
+    ----------
+    xml
+        XML element to operate on.
+    name
+        Name of the child element to look for.
+    config
+        Additional parser configuration.
+    xpath_function
+        Optional XPath function to evaluate on the child element.
+
+    Returns
+    -------
+    :class:`xml.etree.ElementTree.Element` or :class`str` or :py:data:`None`
+        The found child element, or the result of the applied XPath function.
+        :py:data:`None` if the child was not found.
+
+    """
+    if config.clf_namespace_prefix_mapping():
+        elements = xml.xpath(
+            f"clf:{name}{xpath_function}",
+            namespaces=config.clf_namespace_prefix_mapping(),
+        )
+    else:
+        elements = xml.xpath(f"{name}{xpath_function}")
+    return elements
 
 
 def child_element_or_exception(
@@ -321,6 +351,36 @@ def element_as_text(xml, name, config: ParserConfig) -> str:
         return ""
     else:
         return str(text)
+
+
+def element_as_float(xml, name, config: ParserConfig) -> float | None:
+    """
+    Convert a named child of the given XML element to its float value.
+
+    Parameters
+    ----------
+    xml
+        XML element to operate on.
+    name
+        Name of the child element to look for.
+    config
+        Additional parser configuration.
+
+    Returns
+    -------
+    :class:`float`
+        The value of the child element as float. If the child element is not or an
+        invalid float representation, :py:data:`None` is returned.
+
+    """
+    text = child_element(xml, name, config, xpath_function="/text()")
+    if text is None:
+        return None
+    else:
+        try:
+            return float(str(text))
+        except ValueError:
+            return None
 
 
 def elements_as_text_list(xml, name, config: ParserConfig):
