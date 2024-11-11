@@ -7,10 +7,9 @@ import re
 import sys
 from pathlib import Path
 
-import colour_clf_io as package
-
 sys.path.append(str(Path(__file__).parent.parent))
 
+import colour_clf_io as package  # noqa: E402
 
 basename = re.sub("_(\\w)", lambda x: x.group(1).upper(), package.__name__.title())
 
