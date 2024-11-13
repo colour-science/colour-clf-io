@@ -6,13 +6,14 @@ import unittest
 
 import numpy as np
 import pytest
-from test_clf_common import wrap_snippet
 
 import colour_clf_io.elements
 import colour_clf_io.process_nodes
 import colour_clf_io.values
 from colour_clf_io import parse_clf, read_clf
 from colour_clf_io.errors import ParsingError
+
+from .test_clf_common import wrap_snippet
 
 __author__ = "Colour Developers"
 __copyright__ = "Copyright 2013 Colour Developers"
