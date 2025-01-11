@@ -3,7 +3,6 @@ Process List
 ============
 
 Defines the top level Process List object that represents a CLF process.
-
 """
 
 from __future__ import annotations
@@ -28,13 +27,13 @@ from colour_clf_io.process_nodes import (
 )
 
 __author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
-__ALL__ = ["ProcessList"]
+__all__ = ["ProcessList"]
 
 
 @dataclass
@@ -44,7 +43,7 @@ class ProcessList:
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#processList
+    -   https://docs.acescentral.com/specifications/clf/#processList
     """
 
     id: str
@@ -61,30 +60,37 @@ class ProcessList:
     info: Info | None
 
     @staticmethod
-    def from_xml(xml):
+    def from_xml(xml: lxml.etree._Element | None) -> ProcessList | None:
         """
-        Parse and return the Process List from the given XML node. Returns None if the
-        given element is None.
+        Parse and return a :class:`colour_clf_io.ProcessList` class instance
+        from the given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.ProcessList` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
-
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
-        id = xml.get("id")  # noqa: A001
-        must_have(id, "ProcessList must contain an `id` attribute")
+
+        id_ = xml.get("id")
+        must_have(id_, "ProcessList must contain an `id` attribute")
+
         compatible_clf_version = xml.get("compCLFversion")
         must_have(
             compatible_clf_version,
-            "ProcessList must contain an `compCLFversion` attribute",
+            'ProcessList must contain a "compCLFversion" attribute',
         )
 
         # By default, we would expect the correct namespace as per the specification.
@@ -95,9 +101,9 @@ class ProcessList:
         if not namespace:
             config.namespace_name = None
         elif namespace != config.namespace_name:
-            raise ParsingError(
-                f"Found invalid xmlns attribute in process list: {namespace}"
-            )
+            exception = f"Found invalid xmlns attribute in process list: {namespace}"
+
+            raise ParsingError(exception)
 
         name = xml.get("name")
         inverse_of = xml.get("inverseOf")
@@ -111,16 +117,18 @@ class ProcessList:
         process_nodes = filter(
             lambda node: lxml.etree.QName(node).localname not in ignore_nodes, xml
         )
+
         if not process_nodes:
             warn("Got empty process node.")
+
         process_nodes = [
             parse_process_node(xml_node, config) for xml_node in process_nodes
         ]
         assert_bit_depth_compatibility(process_nodes)
 
         return ProcessList(
-            id=id,
-            compatible_CLF_version=compatible_clf_version,
+            id=id_,  # pyright: ignore
+            compatible_CLF_version=compatible_clf_version,  # pyright: ignore
             process_nodes=process_nodes,
             name=name,
             inverse_of=inverse_of,

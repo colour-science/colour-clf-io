@@ -18,55 +18,17 @@ References
 
 from __future__ import annotations
 
-__application_name__ = "Colour - CLF IO"
+import typing
 
-__major_version__ = "0"
-__minor_version__ = "0"
-__change_version__ = "0"
-__version__ = ".".join((__major_version__, __minor_version__, __change_version__))
+if typing.TYPE_CHECKING:
+    from pathlib import Path
 
-
-# Security issues in lxml should be addressed and no longer be a concern:
+# NOTE: Security issues in lxml should be addressed and no longer be a concern:
 # https://discuss.python.org/t/status-of-defusedxml-and-recommendation-in-docs/34762/6
-
-__author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
-__license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
-__maintainer__ = "Colour Developers"
-__email__ = "colour-developers@colour-science.org"
-__status__ = "Production"
-
-__all__ = [
-    "read_clf",
-    "parse_clf",
-    "LUT1D",
-    "LUT3D",
-    "ProcessNode",
-    "ProcessList",
-    "Matrix",
-    "Range",
-    "Exponent",
-    "ExponentStyle",
-    "ExponentParams",
-    "ASC_CDL",
-    "ASC_CDL_Style",
-    "SatNode",
-    "SOPNode",
-    "Interpolation1D",
-    "Interpolation3D",
-    "BitDepth",
-    "Channel",
-    "CalibrationInfo",
-    "Info",
-    "LogParams",
-    "LogStyle",
-    "RangeStyle",
-    "Log",
-]
-
 import lxml.etree
 
 from .elements import (
+    Array,
     CalibrationInfo,
     ExponentParams,
     ExponentStyle,
@@ -88,10 +50,61 @@ from .process_nodes import (
     ProcessNode,
     Range,
 )
-from .values import ASC_CDL_Style, BitDepth, Channel, Interpolation1D, Interpolation3D
+from .values import (
+    ASC_CDL_Style,
+    BitDepth,
+    Channel,
+    Interpolation1D,
+    Interpolation3D,
+)
+
+__author__ = "Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
+__license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
+__maintainer__ = "Colour Developers"
+__email__ = "colour-developers@colour-science.org"
+__status__ = "Production"
+
+__all__ = [
+    "Array",
+    "CalibrationInfo",
+    "ExponentParams",
+    "ExponentStyle",
+    "Info",
+    "LogParams",
+    "LogStyle",
+    "RangeStyle",
+    "SatNode",
+    "SOPNode",
+]
+__all__ += ["ProcessList"]
+__all__ += [
+    "ASC_CDL",
+    "LUT1D",
+    "LUT3D",
+    "Exponent",
+    "Log",
+    "Matrix",
+    "ProcessNode",
+    "Range",
+]
+__all__ += [
+    "ASC_CDL_Style",
+    "BitDepth",
+    "Channel",
+    "Interpolation1D",
+    "Interpolation3D",
+]
+
+__application_name__ = "Colour - CLF IO"
+
+__major_version__ = "0"
+__minor_version__ = "1"
+__change_version__ = "0"
+__version__ = f"{__major_version__}.{__minor_version__}.{__change_version__}"
 
 
-def read_clf(path) -> ProcessList:
+def read_clf(path: str | Path) -> ProcessList | None:
     """
     Read given *CLF* file and return the resulting `ProcessList`.
 
@@ -108,15 +121,15 @@ def read_clf(path) -> ProcessList:
     ------
     :class: ParsingError
         If the given file does not contain a valid CLF document.
-
     """
-    xml = lxml.etree.parse(path)  # noqa: S320
+
+    xml = lxml.etree.parse(str(path))  # noqa: S320
     xml_process_list = xml.getroot()
-    root = ProcessList.from_xml(xml_process_list)
-    return root
+
+    return ProcessList.from_xml(xml_process_list)
 
 
-def parse_clf(text):
+def parse_clf(text: str | bytes) -> ProcessList | None:
     """
     Read given string as a *CLF* document and return the resulting `ProcessList`.
 
@@ -133,8 +146,8 @@ def parse_clf(text):
     ------
     :class: ParsingError
         If the given string does not contain a valid CLF document.
-
     """
+
     xml = lxml.etree.fromstring(text)  # noqa: S320
-    root = ProcessList.from_xml(xml)
-    return root
+
+    return ProcessList.from_xml(xml)

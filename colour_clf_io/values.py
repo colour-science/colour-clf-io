@@ -2,9 +2,8 @@
 Values
 =======
 
-Defines enums that represent allowed values in some of the fields contained in a CLF
-document.
-
+Defines enums that represent allowed values in some of the fields contained in a
+CLF document.
 """
 
 from __future__ import annotations
@@ -13,13 +12,13 @@ import enum
 from enum import Enum
 
 __author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
-__ALL__ = [
+__all__ = [
     "BitDepth",
     "Channel",
     "Interpolation1D",
@@ -34,7 +33,7 @@ class BitDepth(Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#processNode
+    -   https://docs.acescentral.com/specifications/clf/#processNode
     """
 
     i8 = "8i"
@@ -44,13 +43,13 @@ class BitDepth(Enum):
     f16 = "16f"
     f32 = "32f"
 
-    def scale_factor(self):
-        """Return the scale factor that is needed to normalise a value of the given
-        BitDepth to the range 0..1.
+    def scale_factor(self) -> float:
+        """
+        Return the scale factor that is needed to normalise a value of the given
+        bit depth to the range 0..1.
 
         Examples
         --------
-        ```
         >>> from colour_clf_io.values import BitDepth
         >>> 255 / BitDepth.i8.scale_factor() == 1.0
         True
@@ -60,34 +59,37 @@ class BitDepth(Enum):
         True
         >>> 1.0 / BitDepth.f16.scale_factor() == 1.0
         True
-
-        ```
         """
+
         if self == BitDepth.i8:
             return 2**8 - 1
-        elif self == BitDepth.i10:
+
+        if self == BitDepth.i10:
             return 2**10 - 1
-        elif self == BitDepth.i12:
+
+        if self == BitDepth.i12:
             return 2**12 - 1
-        elif self == BitDepth.i16:
+
+        if self == BitDepth.i16:
             return 2**16 - 1
-        elif self in [BitDepth.f16, BitDepth.f32]:
+
+        if self in [BitDepth.f16, BitDepth.f32]:
             return 1.0
-        raise NotImplementedError()
+
+        raise NotImplementedError
 
     @classmethod
-    def all(cls):
-        """Return a list of all valid BitDepth values.
+    def all(cls: type[BitDepth]) -> list:
+        """
+        Return a list of all valid bit depth values.
 
         Examples
         --------
-        ```
         >>> from colour_clf_io.values import BitDepth
         >>> BitDepth.all()
         ['8i', '10i', '12i', '16i', '16f', '32f']
-
-        ```
         """
+
         return [e.value for e in cls]
 
 
@@ -97,7 +99,7 @@ class Channel(enum.Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#ranges
+    -   https://docs.acescentral.com/specifications/clf/#ranges
     """
 
     R = "R"
@@ -111,7 +113,7 @@ class Interpolation1D(Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#lut1d
+    -   https://docs.acescentral.com/specifications/clf/#lut1d
     """
 
     LINEAR = "linear"
@@ -123,7 +125,7 @@ class Interpolation3D(Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#lut3d
+    -   https://docs.acescentral.com/specifications/clf/#lut3d
     """
 
     TRILINEAR = "trilinear"
@@ -136,7 +138,7 @@ class ASC_CDL_Style(enum.Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#asc_cdl
+    -   https://docs.acescentral.com/specifications/clf/#asc_cdl
     """
 
     FWD = "Fwd"

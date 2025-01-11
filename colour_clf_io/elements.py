@@ -4,16 +4,19 @@ Elements
 
 Defines objects that hold data from elements contained in a CLF document. These
 typically are child elements of Process Nodes.
-
 """
 
 from __future__ import annotations
 
 import enum
+import typing
 from dataclasses import dataclass
 
-import numpy.typing as npt
-from typing_extensions import Self
+if typing.TYPE_CHECKING:
+    import numpy.typing as npt
+
+if typing.TYPE_CHECKING:
+    import lxml.etree
 
 from colour_clf_io.errors import ParsingError
 from colour_clf_io.parsing import (
@@ -22,6 +25,7 @@ from colour_clf_io.parsing import (
     child_element,
     child_element_or_exception,
     map_optional,
+    must_have,
     retrieve_attributes,
     retrieve_attributes_as_float,
     three_floats,
@@ -29,7 +33,7 @@ from colour_clf_io.parsing import (
 from colour_clf_io.values import Channel
 
 __author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
@@ -56,44 +60,61 @@ class Array(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#array
+    -   https://docs.acescentral.com/specifications/clf/#array
     """
 
     values: list[float]
     dim: tuple[int, ...]
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:  # noqa: ARG003
+    @staticmethod
+    def from_xml(
+        xml: lxml.etree._Element | None,
+        config: ParserConfig,  # noqa: ARG004
+    ) -> Array | None:
         """
-        Parse and return the Array from the given XML node. Returns None if the given
-        element is None.
+        Parse and return a :class:`colour_clf_io.Array` class instance from the
+        given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.Array` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
-
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
-        dim = tuple(map(int, xml.get("dim").split()))
-        values = list(map(float, xml.text.split()))
-        return cls(values=values, dim=dim)
 
-    def as_array(self) -> npt.ArrayLike:
+        dim = xml.get("dim")
+        must_have(
+            xml,
+            'Array must have a "dim" attribute',
+        )
+
+        dimensions = tuple(map(int, dim.split()))  # pyright: ignore
+        values = list(map(float, xml.text.split()))  # pyright: ignore
+
+        return Array(values=values, dim=dimensions)
+
+    def as_array(self) -> npt.NDArray:
         """
         Convert the CLF element into a numpy array.
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        :class:`numpy`ndarray``
             Array of shape `dim` with the data from `values`.
         """
+
         import numpy as np
 
         dim = self.dim
@@ -110,7 +131,7 @@ class CalibrationInfo(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#processlist
+    -   https://docs.acescentral.com/specifications/clf/#processlist
     """
 
     display_device_serial_num: str | None
@@ -121,25 +142,34 @@ class CalibrationInfo(XMLParsable):
     calibration_software_name: str | None
     calibration_software_version: str | None
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:  # noqa: ARG003
+    @staticmethod
+    def from_xml(
+        xml: lxml.etree._Element | None,
+        config: ParserConfig,  # noqa: ARG004
+    ) -> CalibrationInfo | None:
         """
-        Parse and return the Calibration Info from the given XML node. Returns None
-        if the given element is None.
+        Parse and return a :class:`colour_clf_io.CalibrationInfo` class instance
+        from the given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.CalibrationInfo` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
-
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
+
         attributes = retrieve_attributes(
             xml,
             {
@@ -152,7 +182,8 @@ class CalibrationInfo(XMLParsable):
                 "calibration_software_version": "CalibrationSoftwareVersion",
             },
         )
-        return cls(**attributes)
+
+        return CalibrationInfo(**attributes)
 
 
 class RangeStyle(enum.Enum):
@@ -161,7 +192,7 @@ class RangeStyle(enum.Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#range
+    -   https://docs.acescentral.com/specifications/clf/#range
     """
 
     CLAMP = "Clamp"
@@ -174,7 +205,7 @@ class LogStyle(enum.Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#processList
+    -   https://docs.acescentral.com/specifications/clf/#processList
     """
 
     LOG_10 = "log10"
@@ -193,7 +224,7 @@ class ExponentStyle(enum.Enum):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#exponent
+    -   https://docs.acescentral.com/specifications/clf/#exponent
     """
 
     BASIC_FWD = "basicFwd"
@@ -215,35 +246,45 @@ class SOPNode(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#asc_cdl
+    -   https://docs.acescentral.com/specifications/clf/#asc_cdl
     """
 
     slope: tuple[float, float, float]
     offset: tuple[float, float, float]
     power: tuple[float, float, float]
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:
+    @staticmethod
+    def from_xml(
+        xml: lxml.etree._Element | None, config: ParserConfig
+    ) -> SOPNode | None:
         """
-        Parse and return the SOPNode from the given XML node. Returns None if the given
-        element is None.
+        Parse and return a :class:`colour_clf_io.SOPNode` class instance from the
+        given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.SOPNode` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
+
         slope = three_floats(child_element_or_exception(xml, "Slope", config).text)
         offset = three_floats(child_element_or_exception(xml, "Offset", config).text)
         power = three_floats(child_element_or_exception(xml, "Power", config).text)
-        return cls(slope=slope, offset=offset, power=power)
+
+        return SOPNode(slope=slope, offset=offset, power=power)
 
 
 @dataclass
@@ -253,34 +294,47 @@ class SatNode(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#asc_cdl
+    -   https://docs.acescentral.com/specifications/clf/#asc_cdl
     """
 
     saturation: float
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:
+    @staticmethod
+    def from_xml(
+        xml: lxml.etree._Element | None, config: ParserConfig
+    ) -> SatNode | None:
         """
-        Parse and return the SatNode from the given XML node. Returns None if the given
-        element is None.
+        Parse and return a :class:`colour_clf_io.SatNode` class instance from the
+        given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.SatNode` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
+
         saturation = child_element_or_exception(xml, "Saturation", config).text
         if saturation is None:
-            raise ParsingError("Saturation node in SatNode contains no value.")
+            exception = "Saturation node in SatNode contains no value."
+
+            raise ParsingError(exception)
+
         saturation = float(saturation)
-        return cls(saturation=saturation)
+
+        return SatNode(saturation=saturation)
 
 
 @dataclass
@@ -290,7 +344,7 @@ class Info(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#processList
+    -   https://docs.acescentral.com/specifications/clf/#processList
     """
 
     app_release: str | None
@@ -300,25 +354,31 @@ class Info(XMLParsable):
     aces_user_name: str | None
     calibration_info: CalibrationInfo | None
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:
+    @staticmethod
+    def from_xml(xml: lxml.etree._Element | None, config: ParserConfig) -> Info | None:
         """
-        Parse and return the Info from the given XML node. Returns None if the given
-        element is None.
+        Parse and return a :class:`colour_clf_io.Info` class instance from the
+        given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.Info` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
-
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
+
         attributes = retrieve_attributes(
             xml,
             {
@@ -330,9 +390,11 @@ class Info(XMLParsable):
             },
         )
         calibration_info = CalibrationInfo.from_xml(
-            child_element(xml, "CalibrationInfo", config), config
+            child_element(xml, "CalibrationInfo", config),  # pyright: ignore
+            config,
         )
-        return cls(calibration_info=calibration_info, **attributes)
+
+        return Info(calibration_info=calibration_info, **attributes)
 
 
 @dataclass
@@ -342,7 +404,7 @@ class LogParams(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#log
+    -   https://docs.acescentral.com/specifications/clf/#log
     """
 
     base: float | None
@@ -354,24 +416,34 @@ class LogParams(XMLParsable):
     linear_slope: float | None
     channel: Channel | None
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:  # noqa: ARG003
+    @staticmethod
+    def from_xml(
+        xml: lxml.etree._Element | None,
+        config: ParserConfig,  # noqa: ARG004
+    ) -> LogParams | None:
         """
-        Parse and return the Log Param from the given XML node. Returns None if the
-        given element is None.
+        Parse and return a :class:`colour_clf_io.LogParams` class instance from
+        the given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.LogParams` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
+
         attributes = retrieve_attributes_as_float(
             xml,
             {
@@ -387,7 +459,7 @@ class LogParams(XMLParsable):
 
         channel = map_optional(Channel, xml.get("channel"))
 
-        return cls(channel=channel, **attributes)
+        return LogParams(channel=channel, **attributes)
 
 
 @dataclass
@@ -397,31 +469,41 @@ class ExponentParams(XMLParsable):
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#exponent
+    -   https://docs.acescentral.com/specifications/clf/#exponent
     """
 
     exponent: float
     offset: float | None
     channel: Channel | None
 
-    @classmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:  # noqa: ARG003
+    @staticmethod
+    def from_xml(
+        xml: lxml.etree._Element | None,
+        config: ParserConfig,  # noqa: ARG004
+    ) -> ExponentParams | None:
         """
-        Parse and return the Exponent Params from the given XML node. Returns None if
-        the given element is None.
+        Parse and return a :class:`colour_clf_io.ExponentParams` class instance
+        from the given XML node. Returns `None`` if the given XML node is ``None``.
 
         Expects the xml element to be a valid element according to the CLF
         specification.
 
+        Returns
+        -------
+        class:`colour_clf_io.ExponentParams` or :py:data:`None`
+            Parsed XML node.
+
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
+        :class:`ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
+
         attributes = retrieve_attributes_as_float(
             xml,
             {
@@ -430,8 +512,12 @@ class ExponentParams(XMLParsable):
             },
         )
         exponent = attributes.pop("exponent")
+
         if exponent is None:
-            raise ParsingError("Exponent process node has no `exponent' value.")
+            exception = "Exponent process node has no `exponent' value."
+
+            raise ParsingError(exception)
+
         channel = map_optional(Channel, xml.get("channel"))
 
-        return cls(channel=channel, exponent=exponent, **attributes)
+        return ExponentParams(channel=channel, exponent=exponent, **attributes)
