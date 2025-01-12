@@ -6,9 +6,9 @@ Primary Dependencies
 
 **Colour - CLF IO** requires various dependencies in order to run:
 
-- `python >= 3.9, < 4 <https://www.python.org/download/releases>`__
+- `python >= 3.10, < 4 <https://www.python.org/download/releases>`__
 - `lxml >= 5.2.1 < 6 <https://pypi.org/project/lxml/>`__
-- `numpy >= 1.22, < 2 <https://pypi.org/project/numpy>`__
+- `numpy >= 1.24, < 2 <https://pypi.org/project/numpy>`__
 
 Pypi
 ----

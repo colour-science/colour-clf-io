@@ -1,5 +1,5 @@
 """
-Colour - CLF IO - Documentation Configuration
+Colour - *CLF* IO - Documentation Configuration
 =============================================
 """
 

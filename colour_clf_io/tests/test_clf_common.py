@@ -1,5 +1,5 @@
 """
-Defines helper functionality for CLF tests.
+Defines helper functionality for *CLF* tests.
 """
 
 from __future__ import annotations
@@ -39,22 +39,22 @@ EXAMPLE_WRAPPER: str = """
 
 def wrap_snippet(snippet: str) -> str:
     """
-    Take a string that should contain the text representation of a CLF node, and
-    returns valid CLF document. Essentially the given string is pasted into the
-    `ProcessList` if a CLF document.
+    Take a string that should contain the text representation of a *CLF* node, and
+    returns valid *CLF* file. Essentially the given string is pasted into the
+    `ProcessList` if a *CLF* file.
 
-    This is useful to quickly convert example snippets of Process Nodes into valid CLF
-    documents for parsing.
+    This is useful to quickly convert example snippets of Process Nodes into valid *CLF*
+    files for parsing.
 
     Parameters
     ----------
     snippet
-        Snippet to wrap as a CLF document.
+        Snippet to wrap as a *CLF* file.
 
     Returns
     -------
     :class:`str`
-        CLF document.
+        *CLF* file.
     """
 
     return EXAMPLE_WRAPPER.format(snippet)
@@ -64,7 +64,7 @@ def snippet_to_process_list(
     snippet: str,
 ) -> colour_clf_io.process_list.ProcessList | None:
     """
-    Take a string that should contain a valid body for an XML Process List and
+    Take a string that should contain a valid body for an XML *ProcessList* and
     returns the parsed :class:`colour_clf_io.process_list.ProcessList` class
     instance.
 

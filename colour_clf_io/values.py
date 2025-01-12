@@ -2,8 +2,8 @@
 Values
 =======
 
-Defines enums that represent allowed values in some of the fields contained in a
-CLF document.
+Defines the enumerations that represent allowed values in some of the
+fields contained in a *CLF* file.
 """
 
 from __future__ import annotations
@@ -29,7 +29,16 @@ __all__ = [
 
 class BitDepth(Enum):
     """
-    Represents the valid bit depth values of the CLF specification.
+    Represents the valid bit depth values of the *CLF* specification.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.BitDepth.i8`
+    -   :attr:`~colour_clf_io.BitDepth.i10`
+    -   :attr:`~colour_clf_io.BitDepth.i12`
+    -   :attr:`~colour_clf_io.BitDepth.i16`
+    -   :attr:`~colour_clf_io.BitDepth.f16`
+    -   :attr:`~colour_clf_io.BitDepth.f32`
 
     References
     ----------
@@ -37,11 +46,22 @@ class BitDepth(Enum):
     """
 
     i8 = "8i"
+    """8-bit unsigned integer."""
+
     i10 = "10i"
+    """10-bit unsigned integer."""
+
     i12 = "12i"
+    """12-bit unsigned integer."""
+
     i16 = "16i"
+    """16-bit unsigned integer."""
+
     f16 = "16f"
+    """16-bit floating point (half-float)."""
+
     f32 = "32f"
+    """32-bit floating point (single precision)."""
 
     def scale_factor(self) -> float:
         """
@@ -95,7 +115,13 @@ class BitDepth(Enum):
 
 class Channel(enum.Enum):
     """
-    Represents the valid values of the channel attribute in the Range element.
+    Represents the valid values of the channel attribute in the *Range* element.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.Channel.R`
+    -   :attr:`~colour_clf_io.Channel.G`
+    -   :attr:`~colour_clf_io.Channel.B`
 
     References
     ----------
@@ -109,7 +135,11 @@ class Channel(enum.Enum):
 
 class Interpolation1D(Enum):
     """
-    Represents the valid interpolation values of a LUT1D element.
+    Represents the valid interpolation values of a *LUT1D* element.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.Interpolation1D.LINEAR`
 
     References
     ----------
@@ -121,7 +151,12 @@ class Interpolation1D(Enum):
 
 class Interpolation3D(Enum):
     """
-    Represents the valid interpolation values of a LUT3D element.
+    Represents the valid interpolation values of a *LUT3D* element.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.Interpolation3D.TRILINEAR`
+    -   :attr:`~colour_clf_io.Interpolation3D.TETRAHEDRAL`
 
     References
     ----------
@@ -136,12 +171,26 @@ class ASC_CDL_Style(enum.Enum):
     """
     Represents the valid values of the style attribute of an ASC_CDL element.
 
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.ASC_CDL_Style.FWD`
+    -   :attr:`~colour_clf_io.ASC_CDL_Style.REV`
+    -   :attr:`~colour_clf_io.ASC_CDL_Style.FWD_NO_CLAMP`
+    -   :attr:`~colour_clf_io.ASC_CDL_Style.REV_NO_CLAMP`
+
     References
     ----------
     -   https://docs.acescentral.com/specifications/clf/#asc_cdl
     """
 
     FWD = "Fwd"
+    """Implementation of v1.2 ASC CDL equation (default)."""
+
     REV = "Rev"
+    """Inverse equation."""
+
     FWD_NO_CLAMP = "FwdNoClamp"
+    """Similar to the Fwd equation, but without clamping."""
+
     REV_NO_CLAMP = "RevNoClamp"
+    """Inverse equation, without clamping."""

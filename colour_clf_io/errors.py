@@ -2,7 +2,7 @@
 Errors
 ======
 
-Defines errors that are used as part of the parsing and validation of CLF documents.
+Defines errors that are used as part of the parsing and validation of *CLF* files.
 """
 
 from __future__ import annotations
@@ -22,11 +22,11 @@ __all__ = [
 
 class ParsingError(Exception):
     """
-    Indicates an error with parsing a CLF document.
+    Indicate an error with parsing a *CLF* file.
     """
 
 
 class ValidationError(Exception):
     """
-    Indicates a semantic error with the data in a CLF document.
+    Indicate a semantic error with the data in a *CLF* file.
     """

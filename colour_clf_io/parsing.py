@@ -2,7 +2,7 @@
 Parsing
 =======
 
-Defines utilities that are used to parse CLF documents.
+Defines utilities that are used to parse *CLF* files.
 """
 
 from __future__ import annotations
@@ -54,20 +54,25 @@ NAMESPACE_NAME: str = "urn:AMPAS:CLF:v3.0"
 @dataclass
 class ParserConfig:
     """
-    Additional settings for parsing the CLF document.
+    Additional settings for parsing the *CLF* file.
 
-    Parameters
+    Attributes
     ----------
-    namespace_name
-        The namespace name used for parsing the CLF document. Usually this should be
-        the `CLF_NAMESPACE`, but it can be omitted.
+    -   :attr:`~colour_clf_io.ParserConfig.namespace_name`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.ParserConfig.clf_namespace_prefix_mapping`
     """
 
     namespace_name: str | None = NAMESPACE_NAME
+    """
+    The namespace name used for parsing the *CLF* file. Usually this should
+    be the `CLF_NAMESPACE`, but it can be omitted."""
 
     def clf_namespace_prefix_mapping(self) -> dict[str, str] | None:
         """
-        Return the namespaces prefix mapping used for CLF documents.
+        Return the namespaces prefix mapping used for *CLF* files.
 
         Returns
         -------
@@ -83,7 +88,7 @@ class ParserConfig:
 
 class XMLParsable(ABC):
     """
-    Define the base class for objects that can be generated from XML documents.
+    Define the base class for objects that can be generated from XML files.
 
     This is an :class:`ABCMeta` abstract class that must be inherited by
     sub-classes.
@@ -104,9 +109,9 @@ class XMLParsable(ABC):
         Parameters
         ----------
         xml
-            XML document to read.
+            XML file to read.
         config
-            Additional settings for parsing the document.
+            Additional settings for parsing the file.
 
         Returns
         -------
@@ -117,14 +122,14 @@ class XMLParsable(ABC):
 
 def map_optional(function: Callable, value: Any | None) -> Any:
     """
-    Apply ``function`` to value, if ``value`` is not ``None``.
+    Apply the given function to given ``value`` if ``value`` is not ``None``.
 
     Parameters
     ----------
     function
         The function to apply.
     value
-        The value to apply the function onto
+        The value to apply the function onto.
 
     Returns
     -------
@@ -149,7 +154,7 @@ def retrieve_attributes(
     Parameters
     ----------
     xml
-        The XML element to retrieve attributes from.
+        the XML element to retrieve attributes from.
     attribute_mapping
         The dictionary containing keys and attribute names.
 
@@ -177,7 +182,7 @@ def retrieve_attributes_as_float(
     Parameters
     ----------
     xml
-        The XML element to retrieve attributes from.
+        the XML element to retrieve attributes from.
     attribute_mapping
         The dictionary containing keys and attribute names.
 
@@ -216,7 +221,7 @@ def check_none(value: T | None, message: str) -> TypeGuard[T]:
 
     Raises
     ------
-    :class:`ParsingError` if `value` is :py:data:`None`.
+    :class:`colour_clf_io.errors.ParsingError` if `value` is :py:data:`None`.
 
     Returns
     -------
@@ -325,7 +330,7 @@ def child_element_or_exception(
 
     Raises
     ------
-    :class:`ParsingError` if the child element is not found.
+    :class:`colour_clf_io.errors.ParsingError` if the child element is not found.
 
     Returns
     -------
@@ -482,7 +487,7 @@ def three_floats(text: str | None) -> tuple[float, float, float]:
 
     Raises
     ------
-    :class:`ParsingError`
+    :class:`colour_clf_io.errors.ParsingError`
         If `text` is :py:data:`None`, or cannot be parsed as three floats.
 
     Returns

@@ -2,12 +2,12 @@
 CLF Parsing
 ===========
 
-Defines the functionality and data structures to parse CLF documents.
+Defines the functionality and data structures to parse *CLF* files.
 
 The main functionality is exposed through the following two methods:
--   :func:`colour.io.clf.read_clf`: Read a file in the CLF format and return the
+-   :func:`colour.io.clf.read_clf`: Read a file in the *CLF* format and return the
     corresponding :class: ProcessList.
--   :func:`colour.io.clf.parse_clf`: Read a string that contains a CLF document and
+-   :func:`colour.io.clf.parse_clf`: Read a string that contains a *CLF* file and
     return the corresponding :class: ProcessList.
 
 References
@@ -106,7 +106,7 @@ __version__ = f"{__major_version__}.{__minor_version__}.{__change_version__}"
 
 def read_clf(path: str | Path) -> ProcessList | None:
     """
-    Read given *CLF* file and return the resulting `ProcessList`.
+    Read given *CLF* file and return a *ProcessList*.
 
     Parameters
     ----------
@@ -115,12 +115,13 @@ def read_clf(path: str | Path) -> ProcessList | None:
 
     Returns
     -------
-    :class: colour.clf.ProcessList
+    :class:`colour_clf_io.ProcessList`
+        *ProcessList*.
 
     Raises
     ------
-    :class: ParsingError
-        If the given file does not contain a valid CLF document.
+    :class:`colour_clf_io.errors.ParsingError`
+        If the given file does not contain a valid *CLF* file.
     """
 
     xml = lxml.etree.parse(str(path))  # noqa: S320
@@ -131,21 +132,22 @@ def read_clf(path: str | Path) -> ProcessList | None:
 
 def parse_clf(text: str | bytes) -> ProcessList | None:
     """
-    Read given string as a *CLF* document and return the resulting `ProcessList`.
+    Read given string as a *CLF* file and return a *ProcessList*.
 
     Parameters
     ----------
     text
-        String that contains the *CLF* document.
+        String that contains the *CLF* file.
 
     Returns
     -------
-    :class: colour.clf.ProcessList.
+    :class:`colour_clf_io.ProcessList`
+        *ProcessList*.
 
     Raises
     ------
-    :class: ParsingError
-        If the given string does not contain a valid CLF document.
+    :class:`colour_clf_io.errors.ParsingError`
+        If the given string does not contain a valid *CLF* file.
     """
 
     xml = lxml.etree.fromstring(text)  # noqa: S320

@@ -2,8 +2,8 @@
 Elements
 ========
 
-Defines objects that hold data from elements contained in a CLF document. These
-typically are child elements of Process Nodes.
+Defines objects that hold data from elements contained in a *CLF* file. These
+typically are child elements of *Process* Nodes.
 """
 
 from __future__ import annotations
@@ -22,10 +22,10 @@ from colour_clf_io.errors import ParsingError
 from colour_clf_io.parsing import (
     ParserConfig,
     XMLParsable,
+    check_none,
     child_element,
     child_element_or_exception,
     map_optional,
-    must_have,
     retrieve_attributes,
     retrieve_attributes_as_float,
     three_floats,
@@ -56,7 +56,17 @@ __all__ = [
 @dataclass
 class Array(XMLParsable):
     """
-    Represents an Array element.
+    Represent an *Array* element.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.Array.values`
+    -   :attr:`~colour_clf_io.Array.dim`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.Array.from_xml`
+    -   :meth:`~colour_clf_io.Array.as_array`
 
     References
     ----------
@@ -64,7 +74,13 @@ class Array(XMLParsable):
     """
 
     values: list[float]
+    """Values contained by the element."""
+
     dim: tuple[int, ...]
+    """
+    Specifies the dimension of the LUT or the matrix and the number of
+    colour components.
+    """
 
     @staticmethod
     def from_xml(
@@ -73,10 +89,17 @@ class Array(XMLParsable):
     ) -> Array | None:
         """
         Parse and return a :class:`colour_clf_io.Array` class instance from the
-        given XML node. Returns `None`` if the given XML node is ``None``.
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -85,7 +108,7 @@ class Array(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -95,7 +118,7 @@ class Array(XMLParsable):
             return None
 
         dim = xml.get("dim")
-        must_have(
+        check_none(
             xml,
             'Array must have a "dim" attribute',
         )
@@ -107,7 +130,7 @@ class Array(XMLParsable):
 
     def as_array(self) -> npt.NDArray:
         """
-        Convert the CLF element into a numpy array.
+        Convert the *CLF* element into a numpy array.
 
         Returns
         -------
@@ -127,7 +150,22 @@ class Array(XMLParsable):
 @dataclass
 class CalibrationInfo(XMLParsable):
     """
-    Represents a Calibration Info element.
+    Represent a *CalibrationInfo* container element for a
+    :class:`colour_clf_io.ProcessList` class instance.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.CalibrationInfo.display_device_serial_num`
+    -   :attr:`~colour_clf_io.CalibrationInfo.display_device_host_name`
+    -   :attr:`~colour_clf_io.CalibrationInfo.operator_name`
+    -   :attr:`~colour_clf_io.CalibrationInfo.calibration_date_time`
+    -   :attr:`~colour_clf_io.CalibrationInfo.measurement_probe`
+    -   :attr:`~colour_clf_io.CalibrationInfo.calibration_software_name`
+    -   :attr:`~colour_clf_io.CalibrationInfo.calibration_software_version`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.CalibrationInfo.from_xml`
 
     References
     ----------
@@ -149,10 +187,18 @@ class CalibrationInfo(XMLParsable):
     ) -> CalibrationInfo | None:
         """
         Parse and return a :class:`colour_clf_io.CalibrationInfo` class instance
-        from the given XML node. Returns `None`` if the given XML node is ``None``.
+        from the given XML element. Returns `None`` if the given XML element is
+        ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -161,7 +207,7 @@ class CalibrationInfo(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -188,7 +234,13 @@ class CalibrationInfo(XMLParsable):
 
 class RangeStyle(enum.Enum):
     """
-    Represents the valid values of the style attribute within a Range element.
+    Represent the valid values of the *style* attribute of a
+    :class:`colour_clf_io.Range` *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.RangeStyle.CLAMP`
+    -   :attr:`~colour_clf_io.RangeStyle.NO_CLAMP`
 
     References
     ----------
@@ -196,12 +248,32 @@ class RangeStyle(enum.Enum):
     """
 
     CLAMP = "Clamp"
+    """
+    Clamping is applied upon the result of the scale and offset expressed by
+    the result of the non-clamping Range equation."""
+
     NO_CLAMP = "noClamp"
+    """
+    Scale and offset is applied without clamping (i.e., values below
+    minOutValue or above maxOutValue are preserved).
+    """
 
 
 class LogStyle(enum.Enum):
     """
-    Represents the valid values of the style attribute in a Log element.
+    Represent the valid values of the *style* attribute of a
+    :class:`colour_clf_io.Log` *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.LogStyle.LOG_10`
+    -   :attr:`~colour_clf_io.LogStyle.ANTI_LOG_10`
+    -   :attr:`~colour_clf_io.LogStyle.LOG_2`
+    -   :attr:`~colour_clf_io.LogStyle.ANTI_LOG_2`
+    -   :attr:`~colour_clf_io.LogStyle.LIN_TO_LOG`
+    -   :attr:`~colour_clf_io.LogStyle.LOG_TO_LIN`
+    -   :attr:`~colour_clf_io.LogStyle.CAMERA_LIN_TO_LOG`
+    -   :attr:`~colour_clf_io.LogStyle.CAMERA_LOG_TO_LIN`
 
     References
     ----------
@@ -209,18 +281,53 @@ class LogStyle(enum.Enum):
     """
 
     LOG_10 = "log10"
+    """Apply a base 10 logarithm."""
+
     ANTI_LOG_10 = "antiLog10"
+    """Apply a base 10 anti-logarithm."""
+
     LOG_2 = "log2"
+    """Apply a base 2 logarithm."""
+
     ANTI_LOG_2 = "antiLog2"
+    """Apply a base 2 anti-logarithm."""
+
     LIN_TO_LOG = "linToLog"
+    """Apply a logarithm."""
+
     LOG_TO_LIN = "logToLin"
+    """Apply an anti-logarithm."""
+
     CAMERA_LIN_TO_LOG = "cameraLinToLog"
+    """
+    Apply a piecewise function with logarithmic and linear segments on linear
+    values, converting them to non-linear values.
+    """
+
     CAMERA_LOG_TO_LIN = "cameraLogToLin"
+    """
+    Applies a piecewise function with logarithmic and linear segments on
+    non-linear values, converting them to linear values.
+    """
 
 
 class ExponentStyle(enum.Enum):
     """
-    Represents the valid values of the style attribute of an Exponent element.
+    Represent the valid values of the *style* attribute of a
+    :class:`colour_clf_io.Exponent` *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_MIRROR_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_MIRROR_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_PASS_THRU_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_PASS_THRU_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_MIRROR_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_MIRROR_REV`
 
     References
     ----------
@@ -228,21 +335,87 @@ class ExponentStyle(enum.Enum):
     """
 
     BASIC_FWD = "basicFwd"
+    """
+    Apply a power law using the exponent value specified in the ExponentParams
+    element.
+    """
+
     BASIC_REV = "basicRev"
+    """
+    Apply a power law using the exponent value specified in the ExponentParams
+    element.
+    """
+
     BASIC_MIRROR_FWD = "basicMirrorFwd"
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and mirror
+    the function for values less than zero (i.e., rotationally symmetric around
+    the origin).
+    """
+
     BASIC_MIRROR_REV = "basicMirrorRev"
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and mirror
+    the function for values less than zero (i.e., rotationally symmetric around
+    the origin).
+    """
+
     BASIC_PASS_THRU_FWD = "basicPassThruFwd"  # noqa: S105
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and passes
+    values less than zero unchanged.
+    """
+
     BASIC_PASS_THRU_REV = "basicPassThruRev"  # noqa: S105
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and passes
+    values less than zero unchanged.
+    """
+
     MON_CURVE_FWD = "monCurveFwd"
+    """
+    Apply a power law function with a linear segment near the origin.
+    """
+
     MON_CURVE_REV = "monCurveRev"
+    """
+    Apply a power law function with a linear segment near the origin.
+    """
+
     MON_CURVE_MIRROR_FWD = "monCurveMirrorFwd"
+    """
+    Apply a power law function with a linear segment near the origin and
+    mirror the function for values less than zero (i.e., rotationally symmetric
+    around the origin).
+    """
+
     MON_CURVE_MIRROR_REV = "monCurveMirrorRev"
+    """
+    Apply a power law function with a linear segment near the origin and mirror
+    the function for values less than zero (i.e., rotationally symmetric around
+    the origin).
+    """
 
 
 @dataclass
 class SOPNode(XMLParsable):
     """
-    Represents a SOPNode element.
+    Represent a *SOPNode* element for a :class:`colour_clf_io.ASC_CDL`
+    *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.SOPNode.slope`
+    -   :attr:`~colour_clf_io.SOPNode.offset`
+    -   :attr:`~colour_clf_io.SOPNode.power`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.SOPNode.from_xml`
 
     References
     ----------
@@ -250,8 +423,27 @@ class SOPNode(XMLParsable):
     """
 
     slope: tuple[float, float, float]
+    """
+    Three decimal values representing the R, G, and B slope values, which is
+    similar to gain, but changes the slope of the transfer function without
+    shifting the black level established by offset. Valid values for slope must
+    be greater than or equal to zero. The nominal value is 1.0 for all channels.
+    """
+
     offset: tuple[float, float, float]
+    """
+    Three decimal values representing the R, G, and B offset values, which
+    raise or lower overall brightness of a color component by shifting the
+    transfer function up or down while holding the slope constant. The nominal
+    value is 0.0 for all channels.
+    """
+
     power: tuple[float, float, float]
+    """
+    Three decimal values representing the R, G, and B power values, which
+    change the intermediate shape of the transfer function. Valid values for
+    power must be greater than zero. The nominal value is 1.0 for all channels.
+    """
 
     @staticmethod
     def from_xml(
@@ -259,10 +451,17 @@ class SOPNode(XMLParsable):
     ) -> SOPNode | None:
         """
         Parse and return a :class:`colour_clf_io.SOPNode` class instance from the
-        given XML node. Returns `None`` if the given XML node is ``None``.
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -271,7 +470,7 @@ class SOPNode(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -290,7 +489,16 @@ class SOPNode(XMLParsable):
 @dataclass
 class SatNode(XMLParsable):
     """
-    Represents a SatNode element.
+    Represent a *SatNode* element for a :class:`colour_clf_io.ASC_CDL`
+    *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.SatNode.saturation`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.SatNode.from_xml`
 
     References
     ----------
@@ -298,6 +506,10 @@ class SatNode(XMLParsable):
     """
 
     saturation: float
+    """
+    A single decimal value applied to all color channels. Valid values for
+    saturation must be greater than or equal to zero. The nominal value is 1.0.
+    """
 
     @staticmethod
     def from_xml(
@@ -305,10 +517,17 @@ class SatNode(XMLParsable):
     ) -> SatNode | None:
         """
         Parse and return a :class:`colour_clf_io.SatNode` class instance from the
-        given XML node. Returns `None`` if the given XML node is ``None``.
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -317,7 +536,7 @@ class SatNode(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -340,7 +559,21 @@ class SatNode(XMLParsable):
 @dataclass
 class Info(XMLParsable):
     """
-    Represents a Info element.
+    Represent an *Info* element.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.Info.app_release`
+    -   :attr:`~colour_clf_io.Info.copyright`
+    -   :attr:`~colour_clf_io.Info.revision`
+    -   :attr:`~colour_clf_io.Info.aces_transform_id`
+    -   :attr:`~colour_clf_io.Info.aces_user_name`
+    -   :attr:`~colour_clf_io.Info.calibration_info`
+    -   :attr:`~colour_clf_io.Info.saturation`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.Info.from_xml`
 
     References
     ----------
@@ -348,20 +581,54 @@ class Info(XMLParsable):
     """
 
     app_release: str | None
+    """A string used for indicating application software release level."""
+
     copyright: str | None
+    """A string containing a copyright notice for authorship of the *CLF* file."""
+
     revision: str | None
+    """
+    A string used to track the version of the LUT itself (e.g., an increased
+    resolution from a previous version of the LUT).
+    """
+
     aces_transform_id: str | None
+    """
+    A string containing an ACES transform identifier as described in
+    Academy S-2014-002. If the transform described by the ProcessList is the
+    concatenation of several ACES transforms, this element may contain several
+    ACES Transform IDs, separated by white space or line separators. This
+    element is mandatory for ACES transforms and may be referenced from ACES
+    Metadata Files.
+    """
+
     aces_user_name: str | None
+    """
+    A string containing the user-friendly name recommended for use in product
+    user interfaces as described in Academy TB-2014-002.
+    """
+
     calibration_info: CalibrationInfo | None
+    """
+    Container element for calibration metadata used when making a LUT for a
+    specific device.
+    """
 
     @staticmethod
     def from_xml(xml: lxml.etree._Element | None, config: ParserConfig) -> Info | None:
         """
         Parse and return a :class:`colour_clf_io.Info` class instance from the
-        given XML node. Returns `None`` if the given XML node is ``None``.
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -370,7 +637,7 @@ class Info(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -400,7 +667,23 @@ class Info(XMLParsable):
 @dataclass
 class LogParams(XMLParsable):
     """
-    Represents a Log Param List element.
+    Represent a *LogParams* element for a :class:`colour_clf_io.Log`
+    *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.LogParams.base`
+    -   :attr:`~colour_clf_io.LogParams.log_side_slope`
+    -   :attr:`~colour_clf_io.LogParams.log_side_offset`
+    -   :attr:`~colour_clf_io.LogParams.lin_side_slope`
+    -   :attr:`~colour_clf_io.LogParams.lin_side_offset`
+    -   :attr:`~colour_clf_io.LogParams.lin_side_break`
+    -   :attr:`~colour_clf_io.LogParams.linear_slope`
+    -   :attr:`~colour_clf_io.LogParams.channel`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.LogParams.from_xml`
 
     References
     ----------
@@ -408,13 +691,54 @@ class LogParams(XMLParsable):
     """
 
     base: float | None
+    """The base of the logarithmic function. Default is 2."""
+
     log_side_slope: float | None
+    """
+    Slope" (or gain) applied to the log side of the logarithmic segment. Default is 1.
+    """
+
     log_side_offset: float | None
+    """
+    Offset applied to the log side of the logarithmic segment. Default is 0.
+    """
+
     lin_side_slope: float | None
+    """
+    Slope of the linear side of the logarithmic segment. Default is 1.
+    """
+
     lin_side_offset: float | None
+    """
+    Offset applied to the linear side of the logarithmic segment. Default is 0.
+    """
+
     lin_side_break: float | None
+    """
+    The break-point, defined in linear space, at which the piece-wise function
+    transitions between the logarithmic and linear segments. This is required
+    if style="cameraLinToLog" or "cameraLogToLin".
+    """
+
     linear_slope: float | None
+    """
+    The slope of the linear segment of the piecewise function. This attribute
+    does not need to be provided unless the formula being implemented requires
+    it. The default is to calculate using linSideBreak such that the linear
+    portion is continuous in value with the logarithmic portion of the curve,
+    by using the value of the logarithmic portion of the curve at the break-point.
+    """
+
     channel: Channel | None
+    """
+    The colour channel to which the exponential function is applied. Possible
+    values are "R", "G", "B". If this attribute is utilized to target different
+    adjustments per channel, then up to three *LogParams* elements may be used,
+    provided that "channel" is set differently in each. However, the same value
+    of base must be used for all channels. If this attribute is not otherwise
+    specified, the logarithmic function is applied identically to all three
+    colour channels.
+    """
 
     @staticmethod
     def from_xml(
@@ -423,10 +747,17 @@ class LogParams(XMLParsable):
     ) -> LogParams | None:
         """
         Parse and return a :class:`colour_clf_io.LogParams` class instance from
-        the given XML node. Returns `None`` if the given XML node is ``None``.
+        the given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -435,7 +766,7 @@ class LogParams(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -465,7 +796,18 @@ class LogParams(XMLParsable):
 @dataclass
 class ExponentParams(XMLParsable):
     """
-    Represents a Exponent Params element.
+    Represent a *ExponentParams* element for a :class:`colour_clf_io.Exponent`
+    *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.ExponentParams.exponent`
+    -   :attr:`~colour_clf_io.ExponentParams.offset`
+    -   :attr:`~colour_clf_io.ExponentParams.channel`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.ExponentParams.from_xml`
 
     References
     ----------
@@ -473,8 +815,29 @@ class ExponentParams(XMLParsable):
     """
 
     exponent: float
+    """
+    The power to which the value is to be raised. If style is any of the
+    "monCurve" types, the valid range is [1.0, 10.0]. The nominal value is 1.0.
+    """
+
     offset: float | None
+    """
+    The offset value to use. If offset is used, the enclosing Exponent
+    element's style attribute must be set to one of the "monCurve" types.
+    Offset is not allowed when style is any of the "basic" types. The valid
+    range is [0.0, 0.9]. The nominal value is 0.0.
+    """
+
     channel: Channel | None
+    """
+    The colour channel to which the exponential function is applied. Possible
+    values are "R", "G", "B". If this attribute is utilized to target different
+    adjustments per channel, then up to three *ExponentParams* elements may be used,
+    provided that "channel" is set differently in each. However, the same value
+    of base must be used for all channels. If this attribute is not otherwise
+    specified, the logarithmic function is applied identically to all three
+    colour channels.
+    """
 
     @staticmethod
     def from_xml(
@@ -483,10 +846,18 @@ class ExponentParams(XMLParsable):
     ) -> ExponentParams | None:
         """
         Parse and return a :class:`colour_clf_io.ExponentParams` class instance
-        from the given XML node. Returns `None`` if the given XML node is ``None``.
+        from the given XML element. Returns `None`` if the given XML element is
+        ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -495,7 +866,7 @@ class ExponentParams(XMLParsable):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.

@@ -40,18 +40,18 @@ EXAMPLE_WRAPPER: str = """<?xml version="1.0" ?>
 
 class TestParseCLF:
     """
-    Define tests methods for parsing CLF files using the functionality provided in
-    the :mod: `colour.io.clf`module.
+    Define tests methods for parsing *CLF* files using the functionality
+    provided in the :mod: `colour.io.clf`module.
     """
 
     def test_read_sample_document_1(self) -> None:
         """
-        Test parsing of the sample document `ACES2065_1_to_ACEScct.xml`.
+        Test parsing of the sample file `ACES2065_1_to_ACEScct.xml`.
         """
 
         clf_data = read_clf(os.path.join(ROOT_CLF, "ACES2065_1_to_ACEScct.xml"))
-        assert clf_data is not None
 
+        assert clf_data is not None
         assert clf_data.description == ["Conversion from linear ACES2065-1 to ACEScct"]
         assert clf_data.input_descriptor == "ACES (SMPTE ST 2065-1)"
         assert clf_data.output_descriptor == "ACEScct"
@@ -73,7 +73,7 @@ class TestParseCLF:
 
     def test_read_sample_document_2(self) -> None:
         """
-        Test parsing of the sample document `LMT Kodak 2383 Print Emulation.xml`.
+        Test parsing of the sample file `LMT Kodak 2383 Print Emulation.xml`.
         """
 
         clf_data = read_clf(
@@ -88,7 +88,7 @@ class TestParseCLF:
 
     def test_read_sample_document_3(self) -> None:
         """
-        Test parsing of the sample document `LMT_ARRI_K1S1_709_EI800_v3.xml`.
+        Test parsing of the sample file `LMT_ARRI_K1S1_709_EI800_v3.xml`.
         """
 
         clf_data = read_clf(os.path.join(ROOT_CLF, "LMT_ARRI_K1S1_709_EI800_v3.xml"))
@@ -101,7 +101,7 @@ class TestParseCLF:
 
     def test_LUT1D_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 1.
         """
 
@@ -135,7 +135,7 @@ class TestParseCLF:
 
     def test_LUT3D_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 2.
         """
 
@@ -186,7 +186,7 @@ class TestParseCLF:
 
     def test_matrix_example_1(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 3.
         """
 
@@ -226,7 +226,7 @@ class TestParseCLF:
 
     def test_matrix_example_2(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 4.
         """
 
@@ -281,7 +281,7 @@ class TestParseCLF:
 
     def test_range_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 5.
         """
 
@@ -313,7 +313,7 @@ class TestParseCLF:
 
     def test_log_example_1(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 6.
         """
 
@@ -340,7 +340,7 @@ class TestParseCLF:
 
     def test_log_example_2(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 7.
         """
 
@@ -383,7 +383,7 @@ class TestParseCLF:
 
     def test_exponent_example_1(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 8.
         """
 
@@ -411,7 +411,7 @@ class TestParseCLF:
 
     def test_exponent_example_2(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 9.
         """
 
@@ -442,7 +442,7 @@ class TestParseCLF:
 
     def test_exponent_example_3(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 10.
         """
 
@@ -473,7 +473,7 @@ class TestParseCLF:
 
     def test_exponent_example_4(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 11.
         """
 
@@ -504,7 +504,7 @@ class TestParseCLF:
 
     def test_ASC_CDL_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 12.
         """
 
@@ -545,7 +545,7 @@ class TestParseCLF:
 
     def test_ACES2065_1_to_ACEScg_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 13.
         """
 
@@ -580,7 +580,7 @@ class TestParseCLF:
 
     def test_ACES2065_1_to_ACEScct_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 14.
         """
 
@@ -620,7 +620,7 @@ class TestParseCLF:
 
     def test_CIE_XYZ_to_CIELAB_example(self) -> None:
         """
-        Test parsing of the example process node from the official CLF specification
+        Test parsing of the example process node from the official *CLF* specification
         Example 14.
         """
 
@@ -664,7 +664,7 @@ class TestParseCLF:
 
     def test_fail_on_invalid_namespace(self) -> None:
         """
-        Test parsing oa a process list with an invalid xmlns attribute.
+        Test parsing oa a *ProcessList* with an invalid xmlns attribute.
         """
 
         example = b"""<?xml version="1.0" encoding="UTF-8"?>
@@ -681,7 +681,7 @@ class TestParseCLF:
     @pytest.mark.with_ocio
     def test_CLF_from_OCIO(self) -> None:
         """
-        Test parsing of a CLF file written by OpenColorIO.
+        Test parsing of a *CLF* file written by OpenColorIO.
         """
 
         import PyOpenColorIO as ocio

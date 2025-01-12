@@ -2,7 +2,7 @@
 Process Nodes
 ============
 
-Defines the available process nodes in a CLF document.
+Defines the available process nodes in a *CLF* file.
 """
 
 from __future__ import annotations
@@ -97,7 +97,12 @@ def register_process_node_xml_constructor(name: str) -> Callable:
 @dataclass
 class ProcessNode(XMLParsable, ABC):
     """
-    Represents the common data of all Process Node elements.
+    Represent a *ProcessNode*, an operation to be applied to the image data.
+
+    At least one *ProcessNode* sub-class must be included in a
+    :class:`colour_clf_io.ProcessList` class instance. The base *ProcessNode*
+    class contains attributes and elements that are common to and inherited
+    by the specific sub-types of the *ProcessNode* class.
 
     References
     ----------
@@ -105,23 +110,44 @@ class ProcessNode(XMLParsable, ABC):
     """
 
     id: str | None
+    """A unique identifier for the *ProcessNode*."""
+
     name: str | None
+    """
+    A concise string defining a name for the *ProcessNode* that can be used
+    by an application for display in a user interface.
+    """
+
     in_bit_depth: BitDepth
+    """
+    A string that is used by some *ProcessNodes* to indicate how array or
+    parameter values have been scaled.
+    """
+
     out_bit_depth: BitDepth
+    """
+    A string that is used by some ProcessNodes to indicate how array or
+    parameter values have been scaled.
+    """
+
     description: str | None
+    """
+    An arbitrary string for describing the function, usage, or notes about the
+    *ProcessNode*.
+    """
 
     @staticmethod
     def parse_attributes(xml: lxml.etree._Element, config: ParserConfig) -> dict:
         """
-        Parse the default attributes of a *ProcessNode* and return them as a dictionary
-        of names and their values.
+        Parse the default attributes of a *ProcessNode* and return them as a
+        dictionary of names and their values.
 
         Parameters
         ----------
         xml
-            Source XML element.
+            XML element to parse.
         config
-            Additional parser configuration.
+            XML parser config.
 
         Returns
         -------
@@ -149,7 +175,8 @@ class ProcessNode(XMLParsable, ABC):
 
 
 def assert_bit_depth_compatibility(process_nodes: list[ProcessNode]) -> bool:
-    """Check that the input and output values of adjacent process nodes are
+    """
+    Check that the input and output values of adjacent process nodes are
     compatible. Return true if all nodes are compatible, false otherwise.
 
     Examples
@@ -204,7 +231,14 @@ def assert_bit_depth_compatibility(process_nodes: list[ProcessNode]) -> bool:
 
 def parse_process_node(xml: lxml.etree._Element, config: ParserConfig) -> ProcessNode:
     """
-    Return the correct process node that corresponds to this XML element.
+    Return the *ProcessNode* that corresponds to given XML element.
+
+    Parameters
+    ----------
+    xml
+        XML element to parse.
+    config
+        XML parser config.
 
     Returns
     -------
@@ -232,7 +266,7 @@ def parse_process_node(xml: lxml.etree._Element, config: ParserConfig) -> Proces
 @dataclass
 class LUT1D(ProcessNode):
     """
-    Represents a LUT1D element.
+    Represent a *LUT1D* element.
 
     References
     ----------
@@ -248,11 +282,18 @@ class LUT1D(ProcessNode):
     @register_process_node_xml_constructor("LUT1D")
     def from_xml(xml: lxml.etree._Element | None, config: ParserConfig) -> LUT1D | None:
         """
-        Parse and return a :class:`colour_clf_io.LUT1D` class instance
-        from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.LUT1D` class instance from the
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -261,7 +302,7 @@ class LUT1D(ProcessNode):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -293,7 +334,7 @@ class LUT1D(ProcessNode):
 @dataclass
 class LUT3D(ProcessNode):
     """
-    Represents a LUT3D element.
+    Represent a *LUT3D* element.
 
     References
     ----------
@@ -309,11 +350,18 @@ class LUT3D(ProcessNode):
     @register_process_node_xml_constructor("LUT3D")
     def from_xml(xml: lxml.etree._Element | None, config: ParserConfig) -> LUT3D | None:
         """
-        Parse and return a :class:`colour_clf_io.LUT3D` class instance
-        from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.LUT3D` class instance from the
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -322,7 +370,7 @@ class LUT3D(ProcessNode):
 
         Raises
         ------
-        :class:`ParsingError`
+        :class:`colour_clf_io.errors.ParsingError`
             If the node does not conform to the specification, a ``ParsingError``
             exception will be raised. The error message will indicate the
             details of the issue that was encountered.
@@ -355,7 +403,7 @@ class LUT3D(ProcessNode):
 @dataclass
 class Matrix(ProcessNode):
     """
-    Represents a Matrix element.
+    Represent a *Matrix* element.
 
     References
     ----------
@@ -370,11 +418,18 @@ class Matrix(ProcessNode):
         xml: lxml.etree._Element | None, config: ParserConfig
     ) -> Matrix | None:
         """
-         Parse and return a :class:`colour_clf_io.Matrix` class instance
-         from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.Matrix` class instance from
+        the given XML element. Returns `None`` if the given XML element is ``None``.
 
-         Expects the xml element to be a valid element according to the CLF
-         specification.
+        Expects the XML element to be a valid element according to the *CLF*
+        specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -383,10 +438,10 @@ class Matrix(ProcessNode):
 
         Raises
         ------
-         :class:`ParsingError`
-             If the node does not conform to the specification, a ``ParsingError``
-             exception will be raised. The error message will indicate the
-             details of the issue that was encountered.
+        :class:`colour_clf_io.errors.ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
 
         if xml is None:
@@ -406,7 +461,7 @@ class Matrix(ProcessNode):
 @dataclass
 class Range(ProcessNode):
     """
-    Represents a Range element.
+    Represent a *Range* element.
 
     References
     ----------
@@ -424,11 +479,18 @@ class Range(ProcessNode):
     @register_process_node_xml_constructor("Range")
     def from_xml(xml: lxml.etree._Element | None, config: ParserConfig) -> Range | None:
         """
-         Parse and return a :class:`colour_clf_io.Range` class instance
-         from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.Range` class instance from the
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-         Expects the xml element to be a valid element according to the CLF
-         specification.
+        Expects the XML element to be a valid element according to the *CLF*
+        specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -437,10 +499,10 @@ class Range(ProcessNode):
 
         Raises
         ------
-         :class:`ParsingError`
-             If the node does not conform to the specification, a ``ParsingError``
-             exception will be raised. The error message will indicate the
-             details of the issue that was encountered.
+        :class:`colour_clf_io.errors.ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
 
         if xml is None:
@@ -473,7 +535,7 @@ class Range(ProcessNode):
 @dataclass
 class Log(ProcessNode):
     """
-    Represents a Log element.
+    Represent a *Log* element.
 
     References
     ----------
@@ -487,11 +549,18 @@ class Log(ProcessNode):
     @register_process_node_xml_constructor("Log")
     def from_xml(xml: lxml.etree._Element | None, config: ParserConfig) -> Log | None:
         """
-         Parse and return a :class:`colour_clf_io.Log` class instance
-         from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.Log` class instance from the
+        given XML element. Returns `None`` if the given XML element is ``None``.
 
-         Expects the xml element to be a valid element according to the CLF
-         specification.
+        Expects the XML element to be a valid element according to the *CLF*
+        specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -500,10 +569,10 @@ class Log(ProcessNode):
 
         Raises
         ------
-         :class:`ParsingError`
-             If the node does not conform to the specification, a ``ParsingError``
-             exception will be raised. The error message will indicate the
-             details of the issue that was encountered.
+        :class:`colour_clf_io.errors.ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
 
         if xml is None:
@@ -527,7 +596,7 @@ class Log(ProcessNode):
 @dataclass
 class Exponent(ProcessNode):
     """
-    Represents a Exponent element.
+    Represent an *Exponent* element.
 
     References
     ----------
@@ -543,24 +612,30 @@ class Exponent(ProcessNode):
         xml: lxml.etree._Element | None, config: ParserConfig
     ) -> Exponent | None:
         """
-         Parse and return a :class:`colour_clf_io.Exponent` class instance
-         from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.Exponent` class instance from
+        the given XML element. Returns `None`` if the given XML element is ``None``.
 
-         Expects the xml element to be a valid element according to the CLF
-         specification.
+        Expects the XML element to be a valid element according to the *CLF*
+        specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
          class:`colour_clf_io.Exponent` or :py:data:`None`
              Parsed XML node.
 
-
         Raises
         ------
-         :class:`ParsingError`
-             If the node does not conform to the specification, a ``ParsingError``
-             exception will be raised. The error message will indicate the
-             details of the issue that was encountered.
+        :class:`colour_clf_io.errors.ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
 
         if xml is None:
@@ -595,7 +670,7 @@ class Exponent(ProcessNode):
 @dataclass
 class ASC_CDL(ProcessNode):
     """
-    Represents a ASC_CDL element.
+    Represent an *ASC_CDL* element.
 
     References
     ----------
@@ -612,11 +687,18 @@ class ASC_CDL(ProcessNode):
         xml: lxml.etree._Element | None, config: ParserConfig
     ) -> ASC_CDL | None:
         """
-         Parse and return a :class:`colour_clf_io.ASC_CDL` class instance
-         from the given XML node. Returns `None`` if the given XML node is ``None``.
+        Parse and return a :class:`colour_clf_io.ASC_CDL` class instance from
+        the given XML element. Returns `None`` if the given XML element is ``None``.
 
-         Expects the xml element to be a valid element according to the CLF
-         specification.
+        Expects the XML element to be a valid element according to the *CLF*
+        specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+        config
+            XML parser config.
 
         Returns
         -------
@@ -625,10 +707,10 @@ class ASC_CDL(ProcessNode):
 
         Raises
         ------
-         :class:`ParsingError`
-             If the node does not conform to the specification, a ``ParsingError``
-             exception will be raised. The error message will indicate the
-             details of the issue that was encountered.
+        :class:`colour_clf_io.errors.ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
 
         if xml is None:

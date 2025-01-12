@@ -1,7 +1,6 @@
 Colour - CLF IO
 ===============
 
-
 A `Python <https://www.python.org>`__ package implementing functionality to read and write files in the `Common LUT
 Format (CLF) <https://docs.acescentral.com/specifications/clf/>`__.
 
@@ -15,18 +14,17 @@ Features
 
 The following features are available:
 
-- Reading CLF files to a Python representation.
+- Reading *CLF* files to a Python representation.
 
 The following features are planned and in development:
 
-- Writing CLF files from the Python representation.
-- Validating CLF files according to the specification.
+- Writing *CLF* files from the Python representation.
+- Validating *CLF* files according to the specification.
 
 Features that will not be part of this library:
 
-- Executing CLF workflows and applying them to colours or images. This feature will be implemented as part of `Colour
+- Executing *CLF* workflows and applying them to colours or images. This feature will be implemented as part of `Colour
   <https://github.com/colour-science/colour/>`__.
-
 
 Examples
 ^^^^^^^^
@@ -65,7 +63,8 @@ The *Colour Developers* can be reached via different means:
 - `Facebook <https://www.facebook.com/python.colour.science>`__
 - `Github Discussions <https://github.com/colour-science/colour-clf-io/discussions>`__
 - `Gitter <https://gitter.im/colour-science/colour>`__
-- `Twitter <https://twitter.com/colour_science>`__
+- `X <https://x.com/colour_science>`__
+- `Bluesky <https://bsky.app/profile/colour-science.bsky.social>`__
 
 About
 -----
