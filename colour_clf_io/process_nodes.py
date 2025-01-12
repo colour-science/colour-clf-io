@@ -19,10 +19,7 @@ import lxml.etree
 from colour_clf_io.elements import (
     Array,
     ExponentParams,
-    ExponentStyle,
     LogParams,
-    LogStyle,
-    RangeStyle,
     SatNode,
     SOPNode,
 )
@@ -39,10 +36,13 @@ from colour_clf_io.parsing import (
     sliding_window,
 )
 from colour_clf_io.values import (
-    ASC_CDL_Style,
+    ASC_CDLStyle,
     BitDepth,
+    ExponentStyle,
     Interpolation1D,
     Interpolation3D,
+    LogStyle,
+    RangeStyle,
 )
 
 __author__ = "Colour Developers"
@@ -677,7 +677,7 @@ class ASC_CDL(ProcessNode):
     -   https://docs.acescentral.com/specifications/clf/#asc_cdl
     """
 
-    style: ASC_CDL_Style
+    style: ASC_CDLStyle
     sopnode: SOPNode | None
     sat_node: SatNode | None
 
@@ -717,7 +717,7 @@ class ASC_CDL(ProcessNode):
             return None
 
         super_args = ProcessNode.parse_attributes(xml, config)
-        style = ASC_CDL_Style(xml.get("style"))
+        style = ASC_CDLStyle(xml.get("style"))
         sop_node = SOPNode.from_xml(child_element(xml, "SOPNode", config), config)  # pyright: ignore
         sat_node = SatNode.from_xml(child_element(xml, "SatNode", config), config)  # pyright: ignore
 

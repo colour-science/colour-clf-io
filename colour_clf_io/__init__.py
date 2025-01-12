@@ -31,11 +31,8 @@ from .elements import (
     Array,
     CalibrationInfo,
     ExponentParams,
-    ExponentStyle,
     Info,
     LogParams,
-    LogStyle,
-    RangeStyle,
     SatNode,
     SOPNode,
 )
@@ -51,11 +48,14 @@ from .process_nodes import (
     Range,
 )
 from .values import (
-    ASC_CDL_Style,
+    ASC_CDLStyle,
     BitDepth,
     Channel,
+    ExponentStyle,
     Interpolation1D,
     Interpolation3D,
+    LogStyle,
+    RangeStyle,
 )
 
 __author__ = "Colour Developers"
@@ -68,14 +68,11 @@ __status__ = "Production"
 __all__ = [
     "Array",
     "CalibrationInfo",
-    "ExponentParams",
-    "ExponentStyle",
+    "SOPNode",
+    "SatNode",
     "Info",
     "LogParams",
-    "LogStyle",
-    "RangeStyle",
-    "SatNode",
-    "SOPNode",
+    "ExponentParams",
 ]
 __all__ += ["ProcessList"]
 __all__ += [
@@ -89,11 +86,14 @@ __all__ += [
     "Range",
 ]
 __all__ += [
-    "ASC_CDL_Style",
     "BitDepth",
     "Channel",
     "Interpolation1D",
     "Interpolation3D",
+    "RangeStyle",
+    "LogStyle",
+    "ExponentStyle",
+    "ASC_CDLStyle",
 ]
 
 __application_name__ = "Colour - CLF IO"

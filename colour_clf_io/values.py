@@ -23,7 +23,10 @@ __all__ = [
     "Channel",
     "Interpolation1D",
     "Interpolation3D",
-    "ASC_CDL_Style",
+    "RangeStyle",
+    "LogStyle",
+    "ExponentStyle",
+    "ASC_CDLStyle",
 ]
 
 
@@ -167,16 +170,185 @@ class Interpolation3D(Enum):
     TETRAHEDRAL = "tetrahedral"
 
 
-class ASC_CDL_Style(enum.Enum):
+class RangeStyle(enum.Enum):
+    """
+    Represent the valid values of the *style* attribute of a
+    :class:`colour_clf_io.Range` *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.RangeStyle.CLAMP`
+    -   :attr:`~colour_clf_io.RangeStyle.NO_CLAMP`
+
+    References
+    ----------
+    -   https://docs.acescentral.com/specifications/clf/#range
+    """
+
+    CLAMP = "Clamp"
+    """
+    Clamping is applied upon the result of the scale and offset expressed by
+    the result of the non-clamping Range equation."""
+
+    NO_CLAMP = "noClamp"
+    """
+    Scale and offset is applied without clamping (i.e., values below
+    minOutValue or above maxOutValue are preserved).
+    """
+
+
+class LogStyle(enum.Enum):
+    """
+    Represent the valid values of the *style* attribute of a
+    :class:`colour_clf_io.Log` *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.LogStyle.LOG_10`
+    -   :attr:`~colour_clf_io.LogStyle.ANTI_LOG_10`
+    -   :attr:`~colour_clf_io.LogStyle.LOG_2`
+    -   :attr:`~colour_clf_io.LogStyle.ANTI_LOG_2`
+    -   :attr:`~colour_clf_io.LogStyle.LIN_TO_LOG`
+    -   :attr:`~colour_clf_io.LogStyle.LOG_TO_LIN`
+    -   :attr:`~colour_clf_io.LogStyle.CAMERA_LIN_TO_LOG`
+    -   :attr:`~colour_clf_io.LogStyle.CAMERA_LOG_TO_LIN`
+
+    References
+    ----------
+    -   https://docs.acescentral.com/specifications/clf/#processList
+    """
+
+    LOG_10 = "log10"
+    """Apply a base 10 logarithm."""
+
+    ANTI_LOG_10 = "antiLog10"
+    """Apply a base 10 anti-logarithm."""
+
+    LOG_2 = "log2"
+    """Apply a base 2 logarithm."""
+
+    ANTI_LOG_2 = "antiLog2"
+    """Apply a base 2 anti-logarithm."""
+
+    LIN_TO_LOG = "linToLog"
+    """Apply a logarithm."""
+
+    LOG_TO_LIN = "logToLin"
+    """Apply an anti-logarithm."""
+
+    CAMERA_LIN_TO_LOG = "cameraLinToLog"
+    """
+    Apply a piecewise function with logarithmic and linear segments on linear
+    values, converting them to non-linear values.
+    """
+
+    CAMERA_LOG_TO_LIN = "cameraLogToLin"
+    """
+    Applies a piecewise function with logarithmic and linear segments on
+    non-linear values, converting them to linear values.
+    """
+
+
+class ExponentStyle(enum.Enum):
+    """
+    Represent the valid values of the *style* attribute of a
+    :class:`colour_clf_io.Exponent` *Process Node*.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_MIRROR_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_MIRROR_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_PASS_THRU_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.BASIC_PASS_THRU_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_REV`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_MIRROR_FWD`
+    -   :attr:`~colour_clf_io.ExponentStyle.MON_CURVE_MIRROR_REV`
+
+    References
+    ----------
+    -   https://docs.acescentral.com/specifications/clf/#exponent
+    """
+
+    BASIC_FWD = "basicFwd"
+    """
+    Apply a power law using the exponent value specified in the ExponentParams
+    element.
+    """
+
+    BASIC_REV = "basicRev"
+    """
+    Apply a power law using the exponent value specified in the ExponentParams
+    element.
+    """
+
+    BASIC_MIRROR_FWD = "basicMirrorFwd"
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and mirror
+    the function for values less than zero (i.e., rotationally symmetric around
+    the origin).
+    """
+
+    BASIC_MIRROR_REV = "basicMirrorRev"
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and mirror
+    the function for values less than zero (i.e., rotationally symmetric around
+    the origin).
+    """
+
+    BASIC_PASS_THRU_FWD = "basicPassThruFwd"  # noqa: S105
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and passes
+    values less than zero unchanged.
+    """
+
+    BASIC_PASS_THRU_REV = "basicPassThruRev"  # noqa: S105
+    """
+    Apply a basic power law using the exponent value specified in the
+    ExponentParams element for values greater than or equal to zero and passes
+    values less than zero unchanged.
+    """
+
+    MON_CURVE_FWD = "monCurveFwd"
+    """
+    Apply a power law function with a linear segment near the origin.
+    """
+
+    MON_CURVE_REV = "monCurveRev"
+    """
+    Apply a power law function with a linear segment near the origin.
+    """
+
+    MON_CURVE_MIRROR_FWD = "monCurveMirrorFwd"
+    """
+    Apply a power law function with a linear segment near the origin and
+    mirror the function for values less than zero (i.e., rotationally symmetric
+    around the origin).
+    """
+
+    MON_CURVE_MIRROR_REV = "monCurveMirrorRev"
+    """
+    Apply a power law function with a linear segment near the origin and mirror
+    the function for values less than zero (i.e., rotationally symmetric around
+    the origin).
+    """
+
+
+class ASC_CDLStyle(enum.Enum):
     """
     Represents the valid values of the style attribute of an ASC_CDL element.
 
     Attributes
     ----------
-    -   :attr:`~colour_clf_io.ASC_CDL_Style.FWD`
-    -   :attr:`~colour_clf_io.ASC_CDL_Style.REV`
-    -   :attr:`~colour_clf_io.ASC_CDL_Style.FWD_NO_CLAMP`
-    -   :attr:`~colour_clf_io.ASC_CDL_Style.REV_NO_CLAMP`
+    -   :attr:`~colour_clf_io.ASC_CDLStyle.FWD`
+    -   :attr:`~colour_clf_io.ASC_CDLStyle.REV`
+    -   :attr:`~colour_clf_io.ASC_CDLStyle.FWD_NO_CLAMP`
+    -   :attr:`~colour_clf_io.ASC_CDLStyle.REV_NO_CLAMP`
 
     References
     ----------

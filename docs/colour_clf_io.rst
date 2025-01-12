@@ -49,11 +49,8 @@ Elements
     Array
     CalibrationInfo
     ExponentParams
-    ExponentStyle
     Info
     LogParams
-    LogStyle
-    RangeStyle
     SatNode
     SOPNode
 
@@ -72,4 +69,7 @@ Values (Enumerations)
     Channel
     Interpolation1D
     Interpolation3D
-    ASC_CDL_Style
+    ExponentStyle
+    LogStyle
+    RangeStyle
+    ASC_CDLStyle

@@ -335,7 +335,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.description == "Base 10 Logarithm"
-        assert node.style == colour_clf_io.elements.LogStyle.LOG_10
+        assert node.style == colour_clf_io.values.LogStyle.LOG_10
         assert node.log_params == []
 
     def test_log_example_2(self) -> None:
@@ -365,7 +365,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.description == "Linear to DJI D-Log"
-        assert node.style == colour_clf_io.elements.LogStyle.CAMERA_LIN_TO_LOG
+        assert node.style == colour_clf_io.values.LogStyle.CAMERA_LIN_TO_LOG
         assert node.log_params[0].base is not None
         np.testing.assert_allclose(node.log_params[0].base, 10.0)
         assert node.log_params[0].log_side_slope is not None
@@ -406,7 +406,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.description == "Basic 2.2 Gamma"
-        assert node.style == colour_clf_io.elements.ExponentStyle.BASIC_FWD
+        assert node.style == colour_clf_io.values.ExponentStyle.BASIC_FWD
         np.testing.assert_allclose(node.exponent_params[0].exponent, 2.2)
 
     def test_exponent_example_2(self) -> None:
@@ -434,7 +434,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.description == "EOTF (sRGB)"
-        assert node.style, colour_clf_io.elements.ExponentStyle.MON_CURVE_FWD
+        assert node.style, colour_clf_io.values.ExponentStyle.MON_CURVE_FWD
         assert node.exponent_params[0].exponent is not None
         np.testing.assert_allclose(node.exponent_params[0].exponent, 2.4)
         assert node.exponent_params[0].offset is not None
@@ -465,7 +465,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.description == "CIE L*"
-        assert node.style == colour_clf_io.elements.ExponentStyle.MON_CURVE_REV
+        assert node.style == colour_clf_io.values.ExponentStyle.MON_CURVE_REV
         assert node.exponent_params[0].exponent is not None
         np.testing.assert_allclose(node.exponent_params[0].exponent, 3.0)
         assert node.exponent_params[0].offset is not None
@@ -496,7 +496,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.description == "Rec. 709 OETF"
-        assert node.style == colour_clf_io.elements.ExponentStyle.MON_CURVE_REV
+        assert node.style == colour_clf_io.values.ExponentStyle.MON_CURVE_REV
         assert node.exponent_params[0].exponent is not None
         np.testing.assert_allclose(node.exponent_params[0].exponent, 2.2222222222222222)
         assert node.exponent_params[0].offset is not None
@@ -534,7 +534,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.description == "scene 1 exterior look"
-        assert node.style == colour_clf_io.values.ASC_CDL_Style.FWD
+        assert node.style == colour_clf_io.values.ASC_CDLStyle.FWD
         assert node.sopnode is not None
         assert node.sopnode.slope == (1.000000, 1.000000, 0.900000)
         assert node.sopnode.offset == (-0.030000, -0.020000, 0.000000)
