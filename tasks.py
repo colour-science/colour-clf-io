@@ -42,7 +42,6 @@ __all__ = [
     "PYPI_PACKAGE_NAME",
     "PYPI_ARCHIVE_NAME",
     "BIBLIOGRAPHY_NAME",
-    "literalise",
     "clean",
     "formatting",
     "quality",
@@ -66,7 +65,7 @@ APPLICATION_VERSION: str = colour_clf_io.__version__
 
 PYTHON_PACKAGE_NAME: str = colour_clf_io.__name__
 
-PYPI_PACKAGE_NAME: str = "colour-science-clf-io"
+PYPI_PACKAGE_NAME: str = "colour-clf-io"
 PYPI_ARCHIVE_NAME: str = PYPI_PACKAGE_NAME.replace("-", "_")
 
 BIBLIOGRAPHY_NAME: str = "BIBLIOGRAPHY.bib"
@@ -149,24 +148,6 @@ def message_box(
 
     print_callable(inner(""))
     print_callable("=" * width)
-
-
-@task
-def literalise(ctx: Context) -> None:
-    """
-    Write various literals in the `colour.hints` module.
-
-    Parameters
-    ----------
-    ctx
-        Context.
-    """
-
-    message_box("Literalising...")
-    with ctx.cd("utilities"):
-        ctx.run("./literalise.py")
-
-    ctx.run("pre-commit run --files colour/hints/__init__.py", warn=True)
 
 
 @task
@@ -432,7 +413,7 @@ def requirements(ctx: Context) -> None:
     )
 
 
-@task(literalise, clean, preflight, docs, todo, requirements)
+@task(clean, preflight, docs, todo, requirements)
 def build(ctx: Context) -> None:
     """
     Build the project and runs dependency tasks, i.e., *docs*, *todo*, and
@@ -445,34 +426,7 @@ def build(ctx: Context) -> None:
     """
 
     message_box("Building...")
-    if "modified:   README.rst" in ctx.run("git status").stdout:  # pyright: ignore
-        msg = 'Please commit your changes to the "README.rst" file!'
-        raise RuntimeError(msg)
-
-    with open("README.rst") as readme_file:
-        readme_content = readme_file.read()
-
-    with open("README.rst", "w") as readme_file:
-        # Adding the *Colour* logo as the first content line because the *raw*
-        # directive to support light and dark theme is later trimmed.
-        readme_content = (
-            "..  image:: https://raw.githubusercontent.com/colour-science/"
-            "colour-branding/master/images/Colour_Logo_001.png\n" + readme_content
-        )
-        readme_file.write(
-            re.sub(
-                (
-                    "(\\.\\. begin-trim-long-description.*?"
-                    "\\.\\. end-trim-long-description)"
-                ),
-                "",
-                readme_content,
-                flags=re.DOTALL,
-            )
-        )
-
     ctx.run("uv build")
-    ctx.run("git checkout -- README.rst")
     ctx.run("twine check dist/*")
 
 
@@ -495,9 +449,6 @@ def virtualise(ctx: Context, tests: bool = True) -> None:
         ctx.run(f"mv {PYPI_ARCHIVE_NAME}-{APPLICATION_VERSION} {unique_name}")
         with ctx.cd(unique_name):
             ctx.run("uv sync --all-extras --no-dev")
-            ctx.run(
-                'uv run python -c "import imageio;imageio.plugins.freeimage.download()"'
-            )
             if tests:
                 ctx.run(
                     "source .venv/bin/activate && "
