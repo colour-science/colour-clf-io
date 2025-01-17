@@ -126,7 +126,7 @@ class ProcessNode(XMLParsable, ABC):
 
     out_bit_depth: BitDepth
     """
-    A string that is used by some ProcessNodes to indicate how array or
+    A string that is used by some *ProcessNodes* to indicate how array or
     parameter values have been scaled.
     """
 
