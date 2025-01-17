@@ -9,7 +9,7 @@ from __future__ import annotations
 import codecs
 import os
 
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
@@ -34,7 +34,7 @@ About
 -----
 
 | **Colour** by Colour Developers
-| Copyright 2013 Colour Developers - \
+| Copyright 2024 Colour Developers - \
 `colour-developers@colour-science.org <colour-developers@colour-science.org>`__
 | This software is released under terms of BSD-3-Clause: \
 https://opensource.org/licenses/BSD-3-Clause
@@ -93,7 +93,7 @@ def extract_todo_items(root_directory: str) -> dict:
     return todo_items
 
 
-def export_todo_items(todo_items: dict, file_path: str):
+def export_todo_items(todo_items: dict, file_path: str) -> None:
     """
     Export TODO items to given file.
 

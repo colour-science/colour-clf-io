@@ -37,16 +37,16 @@ Features
 
 The following features are available:
 
-- Reading CLF files to a Python representation.
+- Reading *CLF* files to a Python representation.
 
 The following features are planned and in development:
 
-- Writing CLF files from the Python representation.
-- Validating CLF files according to the specification.
+- Writing *CLF* files from the Python representation.
+- Validating *CLF* files according to the specification.
 
 Features that will not be part of this library:
 
-- Executing CLF workflows and applying them to colours or images. This feature will be implemented as part of `Colour
+- Executing *CLF* workflows and applying them to colours or images. This feature will be implemented as part of `Colour
   <https://github.com/colour-science/colour/>`__.
 
 Examples
@@ -94,9 +94,9 @@ Primary Dependencies
 
 **Colour - CLF IO** requires various dependencies in order to run:
 
-- `python >= 3.9, < 4 <https://www.python.org/download/releases>`__
+- `python >= 3.10, < 4 <https://www.python.org/download/releases>`__
 - `lxml >= 5.2.1 < 6 <https://pypi.org/project/lxml/>`__
-- `numpy >= 1.22, < 2 <https://pypi.org/project/numpy>`__
+- `numpy >= 1.24, < 2 <https://pypi.org/project/numpy>`__
 
 Pypi
 ~~~~
@@ -161,12 +161,13 @@ The *Colour Developers* can be reached via different means:
 - `Facebook <https://www.facebook.com/python.colour.science>`__
 - `Github Discussions <https://github.com/colour-science/colour-clf-io/discussions>`__
 - `Gitter <https://gitter.im/colour-science/colour>`__
-- `Twitter <https://twitter.com/colour_science>`__
+- `X <https://x.com/colour_science>`__
+- `Bluesky <https://bsky.app/profile/colour-science.bsky.social>`__
 
 About
 -----
 
 | **Colour - CLF IO** by Colour Developers
-| Copyright 2015 Colour Developers – `colour-developers@colour-science.org <colour-developers@colour-science.org>`__
+| Copyright 2024 Colour Developers – `colour-developers@colour-science.org <colour-developers@colour-science.org>`__
 | This software is released under terms of BSD-3-Clause: https://opensource.org/licenses/BSD-3-Clause
 | `https://github.com/colour-science/colour-clf-io <https://github.com/colour-science/colour-clf-io>`__

@@ -13,19 +13,23 @@ import re
 import uuid
 from itertools import chain
 from textwrap import TextWrapper
-from typing import Callable
+from typing import TYPE_CHECKING
 
 import biblib.bib
-from invoke.context import Context
 from invoke.tasks import task
 
 import colour_clf_io
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from invoke.context import Context
 
 if not hasattr(inspect, "getargspec"):
     inspect.getargspec = inspect.getfullargspec  # pyright: ignore
 
 __author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
@@ -38,7 +42,6 @@ __all__ = [
     "PYPI_PACKAGE_NAME",
     "PYPI_ARCHIVE_NAME",
     "BIBLIOGRAPHY_NAME",
-    "literalise",
     "clean",
     "formatting",
     "quality",
@@ -62,7 +65,7 @@ APPLICATION_VERSION: str = colour_clf_io.__version__
 
 PYTHON_PACKAGE_NAME: str = colour_clf_io.__name__
 
-PYPI_PACKAGE_NAME: str = "colour-science-clf-io"
+PYPI_PACKAGE_NAME: str = "colour-clf-io"
 PYPI_ARCHIVE_NAME: str = PYPI_PACKAGE_NAME.replace("-", "_")
 
 BIBLIOGRAPHY_NAME: str = "BIBLIOGRAPHY.bib"
@@ -73,7 +76,7 @@ def message_box(
     width: int = 79,
     padding: int = 3,
     print_callable: Callable = print,
-):
+) -> None:
     """
     Print a message inside a box.
 
@@ -123,7 +126,7 @@ def message_box(
 
     ideal_width = width - padding * 2 - 2
 
-    def inner(text):
+    def inner(text: str) -> str:
         """Format and pads inner text for the message box."""
 
         return (
@@ -148,30 +151,12 @@ def message_box(
 
 
 @task
-def literalise(ctx: Context):
-    """
-    Write various literals in the `colour.hints` module.
-
-    Parameters
-    ----------
-    ctx
-        Context.
-    """
-
-    message_box("Literalising...")
-    with ctx.cd("utilities"):
-        ctx.run("./literalise.py")
-
-    ctx.run("pre-commit run --files colour/hints/__init__.py", warn=True)
-
-
-@task
 def clean(
     ctx: Context,
     docs: bool = True,
     bytecode: bool = False,
     pytest: bool = True,
-):
+) -> None:
     """
     Clean the project.
 
@@ -211,7 +196,7 @@ def formatting(
     ctx: Context,
     asciify: bool = True,
     bibtex: bool = True,
-):
+) -> None:
     """
     Convert unicode characters to ASCII and cleanup the *BibTeX* file.
 
@@ -254,7 +239,7 @@ def quality(
     ctx: Context,
     pyright: bool = True,
     rstlint: bool = True,
-):
+) -> None:
     """
     Check the codebase with *Pyright* and lints various *restructuredText*
     files with *rst-lint*.
@@ -279,7 +264,7 @@ def quality(
 
 
 @task
-def precommit(ctx: Context):
+def precommit(ctx: Context) -> None:
     """
     Run the "pre-commit" hooks on the codebase.
 
@@ -294,7 +279,7 @@ def precommit(ctx: Context):
 
 
 @task
-def tests(ctx: Context):
+def tests(ctx: Context) -> None:
     """
     Run the unit tests with *Pytest*.
 
@@ -315,7 +300,7 @@ def tests(ctx: Context):
 
 
 @task
-def examples(ctx: Context, plots: bool = False):
+def examples(ctx: Context, plots: bool = False) -> None:
     """
     Run the examples.
 
@@ -346,7 +331,7 @@ def examples(ctx: Context, plots: bool = False):
 
 
 @task(formatting, quality, precommit, tests, examples)
-def preflight(ctx: Context):  # noqa: ARG001
+def preflight(ctx: Context) -> None:  # noqa: ARG001
     """
     Perform the preflight tasks, i.e., *formatting*, *tests*, *quality*, and
     *examples*.
@@ -365,7 +350,7 @@ def docs(
     ctx: Context,
     html: bool = True,
     pdf: bool = True,
-):
+) -> None:
     """
     Build the documentation.
 
@@ -391,7 +376,7 @@ def docs(
 
 
 @task
-def todo(ctx: Context):
+def todo(ctx: Context) -> None:
     """
     Export the TODO items.
 
@@ -408,7 +393,7 @@ def todo(ctx: Context):
 
 
 @task
-def requirements(ctx: Context):
+def requirements(ctx: Context) -> None:
     """
     Export the *requirements.txt* file.
 
@@ -428,8 +413,8 @@ def requirements(ctx: Context):
     )
 
 
-@task(literalise, clean, preflight, docs, todo, requirements)
-def build(ctx: Context):
+@task(clean, preflight, docs, todo, requirements)
+def build(ctx: Context) -> None:
     """
     Build the project and runs dependency tasks, i.e., *docs*, *todo*, and
     *preflight*.
@@ -441,38 +426,12 @@ def build(ctx: Context):
     """
 
     message_box("Building...")
-    if "modified:   README.rst" in ctx.run("git status").stdout:  # pyright: ignore
-        raise RuntimeError('Please commit your changes to the "README.rst" file!')
-
-    with open("README.rst") as readme_file:
-        readme_content = readme_file.read()
-
-    with open("README.rst", "w") as readme_file:
-        # Adding the *Colour* logo as the first content line because the *raw*
-        # directive to support light and dark theme is later trimmed.
-        readme_content = (
-            "..  image:: https://raw.githubusercontent.com/colour-science/"
-            "colour-branding/master/images/Colour_Logo_001.png\n" + readme_content
-        )
-        readme_file.write(
-            re.sub(
-                (
-                    "(\\.\\. begin-trim-long-description.*?"
-                    "\\.\\. end-trim-long-description)"
-                ),
-                "",
-                readme_content,
-                flags=re.DOTALL,
-            )
-        )
-
     ctx.run("uv build")
-    ctx.run("git checkout -- README.rst")
     ctx.run("twine check dist/*")
 
 
 @task
-def virtualise(ctx: Context, tests: bool = True):
+def virtualise(ctx: Context, tests: bool = True) -> None:
     """
     Create a virtual environment for the project build.
 
@@ -490,9 +449,6 @@ def virtualise(ctx: Context, tests: bool = True):
         ctx.run(f"mv {PYPI_ARCHIVE_NAME}-{APPLICATION_VERSION} {unique_name}")
         with ctx.cd(unique_name):
             ctx.run("uv sync --all-extras --no-dev")
-            ctx.run(
-                'uv run python -c "import imageio;imageio.plugins.freeimage.download()"'
-            )
             if tests:
                 ctx.run(
                     "source .venv/bin/activate && "
@@ -505,7 +461,7 @@ def virtualise(ctx: Context, tests: bool = True):
 
 
 @task
-def tag(ctx: Context):
+def tag(ctx: Context) -> None:
     """
     Tag the repository according to defined version using *git-flow*.
 
@@ -519,7 +475,8 @@ def tag(ctx: Context):
     result = ctx.run("git rev-parse --abbrev-ref HEAD", hide="both")
 
     if result.stdout.strip() != "develop":  # pyright: ignore
-        raise RuntimeError("Are you still on a feature or master branch?")
+        msg = "Are you still on a feature or master branch?"
+        raise RuntimeError(msg)
 
     with open(os.path.join(PYTHON_PACKAGE_NAME, "__init__.py")) as file_handle:
         file_content = file_handle.read()
@@ -539,7 +496,7 @@ def tag(ctx: Context):
             1
         )
 
-        version = ".".join((major_version, minor_version, change_version))
+        version = f"{major_version}.{minor_version}.{change_version}"
 
         result = ctx.run("git ls-remote --tags upstream", hide="both")
         remote_tags = result.stdout.strip().split("\n")  # pyright: ignore
@@ -548,17 +505,18 @@ def tag(ctx: Context):
             tags.add(remote_tag.split("refs/tags/")[1].replace("refs/tags/", "^{}"))
         version_tags = sorted(tags)
         if f"v{version}" in version_tags:
-            raise RuntimeError(
+            msg = (
                 f'A "{PYTHON_PACKAGE_NAME}" "v{version}" tag already exists in '
                 f"remote repository!"
             )
+            raise RuntimeError(msg)
 
         ctx.run(f"git flow release start v{version}")
         ctx.run(f"git flow release finish v{version}")
 
 
 @task(build)
-def release(ctx: Context):
+def release(ctx: Context) -> None:
     """
     Release the project to *Pypi* with *Twine*.
 
@@ -575,7 +533,7 @@ def release(ctx: Context):
 
 
 @task
-def sha256(ctx: Context):
+def sha256(ctx: Context) -> None:
     """
     Compute the project *Pypi* package *sha256* with *OpenSSL*.
 

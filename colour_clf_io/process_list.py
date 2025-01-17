@@ -1,9 +1,8 @@
 """
-Process List
+*ProcessList*
 ============
 
-Defines the top level Process List object that represents a CLF process.
-
+Defines the top level *ProcessList* object that represents a *CLF* process.
 """
 
 from __future__ import annotations
@@ -17,9 +16,9 @@ from colour_clf_io.elements import Info
 from colour_clf_io.errors import ParsingError
 from colour_clf_io.parsing import (
     ParserConfig,
+    check_none,
     element_as_text,
     elements_as_text_list,
-    must_have,
 )
 from colour_clf_io.process_nodes import (
     ProcessNode,
@@ -28,63 +27,133 @@ from colour_clf_io.process_nodes import (
 )
 
 __author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
-__ALL__ = ["ProcessList"]
+__all__ = ["ProcessList"]
 
 
 @dataclass
 class ProcessList:
     """
-    Represents a Process List.
+    Represent a *ProcessList*, the root element for any *CLF* file. It is
+    composed of one or more :class:`colour_clf_io.ProcessNodes` class instances.
+
+    Attributes
+    ----------
+    -   :attr:`~colour_clf_io.ProcessList.id`
+    -   :attr:`~colour_clf_io.ProcessList.compatible_CLF_version`
+    -   :attr:`~colour_clf_io.ProcessList.name`
+    -   :attr:`~colour_clf_io.ProcessList.inverse_of`
+    -   :attr:`~colour_clf_io.ProcessList.description`
+    -   :attr:`~colour_clf_io.ProcessList.input_descriptor`
+    -   :attr:`~colour_clf_io.ProcessList.output_descriptor`
+    -   :attr:`~colour_clf_io.ProcessList.info`
+    -   :attr:`~colour_clf_io.ProcessList.process_nodes`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.ProcessList.from_xml`
 
     References
     ----------
-    https://docs.acescentral.com/specifications/clf/#processList
+    -   https://docs.acescentral.com/specifications/clf/#processList
     """
 
     id: str
+    """A string to serve as a unique identifier of the *ProcessList*."""
+
     compatible_CLF_version: str
-    process_nodes: list[ProcessNode]
+    """
+    A string indicating the minimum compatible CLF specification version
+    required to read this file. The compCLFversion corresponding to this
+    version of the specification is be "3.0".
+    """
 
     name: str | None
+    """
+    A concise string used as a text name of the *ProcessList* for display or
+    selection from an application's user interface.
+    """
+
     inverse_of: str | None
+    """
+    A string for linking to another *ProcessList* id (unique) which is the
+    inverse of this one.
+    """
 
     description: list[str]
+    """
+    A list for comments describing the function, usage, or any notes about
+    the *ProcessList*.
+    """
+
     input_descriptor: str | None
+    """
+    An arbitrary string used to describe the intended source code values of the
+    *ProcessList*.
+    """
+
     output_descriptor: str | None
+    """
+    An arbitrary string used to describe the intended output target of the
+    *ProcessList* (e.g., target display).
+    """
+
+    process_nodes: list[ProcessNode]
+    """
+    A list of colour operators. The *ProcessList* must contain at least one
+    *ProcessNode*.
+    """
 
     info: Info | None
+    """
+    Optional element for including additional custom metadata not needed to
+    interpret the transforms.
+    """
+    """"""
 
     @staticmethod
-    def from_xml(xml):
+    def from_xml(xml: lxml.etree._Element | None) -> ProcessList | None:
         """
-        Parse and return the Process List from the given XML node. Returns None if the
-        given element is None.
+        Parse and return a :class:`colour_clf_io.ProcessList` class instance
+        from the given XML element. Returns `None`` if the given XML element is
+        ``None``.
 
-        Expects the xml element to be a valid element according to the CLF
+        Expects the XML element to be a valid element according to the *CLF*
         specification.
+
+        Parameters
+        ----------
+        xml
+            XML element to parse.
+
+        Returns
+        -------
+        class:`colour_clf_io.ProcessList` or :py:data:`None`
+            Parsed XML node.
 
         Raises
         ------
-        :class: ParsingError
-            If the node does not conform to the specification, a `ParsingError`
-            will be raised. The error message will indicate the details of the issue
-            that was encountered.
-
+        :class:`colour_clf_io.errors.ParsingError`
+            If the node does not conform to the specification, a ``ParsingError``
+            exception will be raised. The error message will indicate the
+            details of the issue that was encountered.
         """
+
         if xml is None:
             return None
-        id = xml.get("id")  # noqa: A001
-        must_have(id, "ProcessList must contain an `id` attribute")
+
+        id_ = xml.get("id")
+        check_none(id_, "ProcessList must contain an `id` attribute")
+
         compatible_clf_version = xml.get("compCLFversion")
-        must_have(
+        check_none(
             compatible_clf_version,
-            "ProcessList must contain an `compCLFversion` attribute",
+            'ProcessList must contain a "compCLFversion" attribute',
         )
 
         # By default, we would expect the correct namespace as per the specification.
@@ -95,9 +164,9 @@ class ProcessList:
         if not namespace:
             config.namespace_name = None
         elif namespace != config.namespace_name:
-            raise ParsingError(
-                f"Found invalid xmlns attribute in process list: {namespace}"
-            )
+            exception = f"Found invalid xmlns attribute in *ProcessList*: {namespace}"
+
+            raise ParsingError(exception)
 
         name = xml.get("name")
         inverse_of = xml.get("inverseOf")
@@ -111,16 +180,18 @@ class ProcessList:
         process_nodes = filter(
             lambda node: lxml.etree.QName(node).localname not in ignore_nodes, xml
         )
+
         if not process_nodes:
             warn("Got empty process node.")
+
         process_nodes = [
             parse_process_node(xml_node, config) for xml_node in process_nodes
         ]
         assert_bit_depth_compatibility(process_nodes)
 
         return ProcessList(
-            id=id,
-            compatible_CLF_version=compatible_clf_version,
+            id=id_,  # pyright: ignore
+            compatible_CLF_version=compatible_clf_version,  # pyright: ignore
             process_nodes=process_nodes,
             name=name,
             inverse_of=inverse_of,

@@ -10,7 +10,7 @@ import codecs
 import os
 import unicodedata
 
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
@@ -31,7 +31,7 @@ SUBSTITUTIONS: dict[str, str] = {
 }
 
 
-def unicode_to_ascii(root_directory: str):
+def unicode_to_ascii(root_directory: str) -> None:
     """
     Recursively convert from unicode to ASCII *.py*, *.bib* and *.rst* files
     in given directory.

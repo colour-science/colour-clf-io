@@ -2,84 +2,93 @@
 Parsing
 =======
 
-Defines utilities that are used to parse CLF documents.
-
+Defines utilities that are used to parse *CLF* files.
 """
 
 from __future__ import annotations
 
 import collections
-import xml.etree
-import xml.etree.ElementTree
+import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from itertools import islice
-from typing import Callable, TypeVar
+from typing import TypeGuard, TypeVar
 
-from typing_extensions import Self, TypeGuard
+if typing.TYPE_CHECKING:
+    from collections.abc import Callable, Iterable
+    from typing import Any
+
+if typing.TYPE_CHECKING:
+    import lxml.etree
 
 from colour_clf_io.errors import ParsingError
 
 __author__ = "Colour Developers"
-__copyright__ = "Copyright 2013 Colour Developers"
+__copyright__ = "Copyright 2024 Colour Developers"
 __license__ = "BSD-3-Clause - https://opensource.org/licenses/BSD-3-Clause"
 __maintainer__ = "Colour Developers"
 __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
-__ALL__ = [
+__all__ = [
+    "NAMESPACE_NAME",
     "ParserConfig",
     "XMLParsable",
-    "fully_qualified_name",
     "map_optional",
     "retrieve_attributes",
     "retrieve_attributes_as_float",
-    "must_have",
+    "check_none",
     "child_element",
     "child_elements",
     "child_element_or_exception",
     "element_as_text",
+    "element_as_float",
     "elements_as_text_list",
     "sliding_window",
     "three_floats",
-    "element_as_float",
 ]
 
-_T = TypeVar("_T")
-
-NAMESPACE_NAME = "urn:AMPAS:CLF:v3.0"
+NAMESPACE_NAME: str = "urn:AMPAS:CLF:v3.0"
 
 
 @dataclass
 class ParserConfig:
-    """Additional settings for parsing the CLF document.
+    """
+    Additional settings for parsing the *CLF* file.
 
-    Parameters
+    Attributes
     ----------
-    namespace_name
-        The namespace name used for parsing the CLF document. Usually this should be
-        the `CLF_NAMESPACE`, but it can be omitted.
+    -   :attr:`~colour_clf_io.ParserConfig.namespace_name`
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.ParserConfig.clf_namespace_prefix_mapping`
     """
 
     namespace_name: str | None = NAMESPACE_NAME
+    """
+    The namespace name used for parsing the *CLF* file. Usually this should
+    be the `CLF_NAMESPACE`, but it can be omitted."""
 
     def clf_namespace_prefix_mapping(self) -> dict[str, str] | None:
-        """Return the namespaces prefix mapping used for CLF documents.
+        """
+        Return the namespaces prefix mapping used for *CLF* files.
 
         Returns
         -------
-        :class:`dict[str, str]` that contains the namespaces prefix mappings.
-
+        :class:`dict[str, str]` or :py:data:`None`
+            Dictionary that contain the namespaces prefix mappings.
         """
+
         if self.namespace_name:
             return {"clf": self.namespace_name}
-        else:
-            return None
+
+        return None
 
 
 class XMLParsable(ABC):
     """
-    Define the base class for objects that can be generated from XML documents.
+    Define the base class for objects that can be generated from XML files.
 
     This is an :class:`ABCMeta` abstract class that must be inherited by
     sub-classes.
@@ -89,59 +98,63 @@ class XMLParsable(ABC):
     -   :meth:`~colour_lf_io.parsing.XMLParsable.from_xml`
     """
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    def from_xml(cls, xml, config: ParserConfig) -> Self | None:
+    def from_xml(
+        xml: lxml.etree._Element | None, config: ParserConfig
+    ) -> XMLParsable | None:
         """
         Parse an object of this class from the given XML object.
 
         Parameters
         ----------
         xml
-            XML document to read.
+            XML file to read.
         config
-            Additional settings for parsing the document.
+            Additional settings for parsing the file.
 
         Returns
         -------
-        An instance of the parsed object, or :py:data:`None` if parsing failed.
-
+        :class:`colour_clf_io.parsing.XMLParsable` or :py:data:`None`
+            Parsed object or ``None`` if parsing failed.
         """
 
 
-def map_optional(f: Callable, value):
+def map_optional(function: Callable, value: Any | None) -> Any:
     """
-    Apply `f` to value, if `value` is not :py:data:`None`.
+    Apply the given function to given ``value`` if ``value`` is not ``None``.
 
     Parameters
     ----------
-    f
+    function
         The function to apply.
     value
-        The value (that might be :py:data:`None`)
+        The value to apply the function onto.
 
     Returns
     -------
-    The result of applying `f` to `value`, or :py:data:`None`.
-
+    :class:`object` or :py:data:`None`
+        The result of applying ``function`` to ``value``.
     """
+
     if value is not None:
-        return f(value)
+        return function(value)
+
     return None
 
 
 def retrieve_attributes(
-    xml, attribute_mapping: dict[str, str]
+    xml: lxml.etree._Element, attribute_mapping: dict[str, str]
 ) -> dict[str, str | None]:
     """
-    Take a dictionary of keys and attribute names and map the attribute names to the
-    corresponding values from the given XML element. Note that the keys of the
-    attribute mapping are not used in any way.
+    Take a dictionary of keys and attribute names and map the attribute names
+    to the corresponding values from the given XML element. Note that the keys
+    of the attribute mapping are not used in any way.
 
     Parameters
     ----------
     xml
-        The XML element to retrieve attributes from.
+        the XML element to retrieve attributes from.
     attribute_mapping
         The dictionary containing keys and attribute names.
 
@@ -149,15 +162,15 @@ def retrieve_attributes(
     -------
     :class:`dict[str, str | None]`
         The resulting dictionary of keys and attribute values.
-
     """
+
     return {
         k: xml.get(attribute_name) for k, attribute_name in attribute_mapping.items()
     }
 
 
 def retrieve_attributes_as_float(
-    xml, attribute_mapping: dict[str, str]
+    xml: lxml.etree._Element, attribute_mapping: dict[str, str]
 ) -> dict[str, float | None]:
     """
     Take a dictionary of keys and attribute names and map the attribute names to the
@@ -169,7 +182,7 @@ def retrieve_attributes_as_float(
     Parameters
     ----------
     xml
-        The XML element to retrieve attributes from.
+        the XML element to retrieve attributes from.
     attribute_mapping
         The dictionary containing keys and attribute names.
 
@@ -177,22 +190,25 @@ def retrieve_attributes_as_float(
     -------
     :class:`dict[str, float | None]`
         The resulting dictionary of keys and attribute values.
-
     """
+
     attributes = retrieve_attributes(xml, attribute_mapping)
 
-    def as_float(value):
-        if value is None:
-            return None
+    def as_float(value: Any) -> float | None:
+        """Convert given value to float."""
+
         try:
             return float(value)
-        except ValueError:
+        except (ValueError, TypeError):
             return None
 
     return {key: as_float(value) for key, value in attributes.items()}
 
 
-def must_have(value: _T | None, message) -> TypeGuard[_T]:
+T = TypeVar("T")
+
+
+def check_none(value: T | None, message: str) -> TypeGuard[T]:
     """
     Assert that `value` is not :py:data:`None`.
 
@@ -205,21 +221,22 @@ def must_have(value: _T | None, message) -> TypeGuard[_T]:
 
     Raises
     ------
-    :class:`ParsingError` if `value` is :py:data:`None`.
+    :class:`colour_clf_io.errors.ParsingError` if `value` is :py:data:`None`.
 
     Returns
     -------
     :class:`TypeGuard`
-
     """
+
     if value is None:
         raise ParsingError(message)
+
     return True
 
 
 def child_element(
-    xml, name, config: ParserConfig, xpath_function=""
-) -> xml.etree.ElementTree.Element | None | str:
+    xml: lxml.etree._Element, name: str, config: ParserConfig, xpath_function: str = ""
+) -> lxml.etree._Element | str | None:
     """
     Return a named child element of the given XML element.
 
@@ -239,25 +256,28 @@ def child_element(
     :class:`xml.etree.ElementTree.Element` or :class`str` or :py:data:`None`
         The found child element, or the result of the applied XPath function.
         :py:data:`None` if the child was not found.
-
     """
 
     elements = child_elements(xml, name, config, xpath_function)
     element_count = len(elements)
+
     if element_count == 0:
         return None
-    elif element_count == 1:
+
+    if element_count == 1:
         return elements[0]
-    else:
-        raise ParsingError(
-            f"Found multiple elements of type {name} in "
-            f"element {xml}, but only expected exactly one."
-        )
+
+    exception = (
+        f"Found multiple elements of type {name} in "
+        f"element {xml}, but only expected exactly one."
+    )
+
+    raise ParsingError(exception)
 
 
 def child_elements(
-    xml, name, config: ParserConfig, xpath_function=""
-) -> list[xml.etree.ElementTree.Element] | list[str]:
+    xml: lxml.etree._Element, name: str, config: ParserConfig, xpath_function: str = ""
+) -> list[lxml.etree._Element] | list[str]:
     """
     Return all child elements with a given name of an XML element.
 
@@ -274,11 +294,11 @@ def child_elements(
 
     Returns
     -------
-    :class:`xml.etree.ElementTree.Element` or :class`str` or :py:data:`None`
+    :class:`xml.etree.ElementTree.Element` or :class`str`
         The found child element, or the result of the applied XPath function.
         :py:data:`None` if the child was not found.
-
     """
+
     if config.clf_namespace_prefix_mapping():
         elements = xml.xpath(
             f"clf:{name}{xpath_function}",
@@ -286,15 +306,16 @@ def child_elements(
         )
     else:
         elements = xml.xpath(f"{name}{xpath_function}")
-    return elements
+
+    return elements  # pyright: ignore
 
 
 def child_element_or_exception(
-    xml, name, config: ParserConfig
-) -> xml.etree.ElementTree.Element:
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> lxml.etree._Element:
     """
-    Return a named child element of the given XML element, or raise an exception if no
-    such child element is found.
+    Return a named child element of the given XML element, or raise an exception
+    if no such child element is found.
 
     Parameters
     ----------
@@ -309,24 +330,33 @@ def child_element_or_exception(
 
     Raises
     ------
-    :class:`ParsingError` if the child element is not found.
+    :class:`colour_clf_io.errors.ParsingError` if the child element is not found.
 
     Returns
     -------
     :class:`xml.etree.ElementTree.Element`
         The found child element.
     """
+
     element = child_element(xml, name, config)
-    assert not isinstance(element, str)  # noqa: S101
+
+    if isinstance(element, str):
+        exception = f'Element "{element}" cannot be a string!'
+
+        raise TypeError(exception)
+
     if element is None:
-        raise ParsingError(
+        exception = (
             f"Tried to retrieve child element '{name}' from '{xml}' but child was "
             "not present."
         )
+
+        raise ParsingError(exception)
+
     return element
 
 
-def element_as_text(xml, name, config: ParserConfig) -> str:
+def element_as_text(xml: lxml.etree._Element, name: str, config: ParserConfig) -> str:
     """
     Convert a named child of the given XML element to its text value.
 
@@ -342,18 +372,21 @@ def element_as_text(xml, name, config: ParserConfig) -> str:
     Returns
     -------
     :class:`str`
-        The text value of the child element. If the child element is not present and
-        empty string is returned.
-
+        The text value of the child element. If the child element is not present
+        an empty string is returned.
     """
+
     text = child_element(xml, name, config, xpath_function="/text()")
+
     if text is None:
         return ""
-    else:
-        return str(text)
+
+    return str(text)
 
 
-def element_as_float(xml, name, config: ParserConfig) -> float | None:
+def element_as_float(
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> float | None:
     """
     Convert a named child of the given XML element to its float value.
 
@@ -368,24 +401,28 @@ def element_as_float(xml, name, config: ParserConfig) -> float | None:
 
     Returns
     -------
-    :class:`float`
-        The value of the child element as float. If the child element is not or an
-        invalid float representation, :py:data:`None` is returned.
-
+    :class:`float` or :py:data:`None`
+        The value of the child element as float. If the child element is not or
+        an invalid float representation, ``None`` is returned.
     """
+
     text = child_element(xml, name, config, xpath_function="/text()")
+
     if text is None:
         return None
-    else:
-        try:
-            return float(str(text))
-        except ValueError:
-            return None
+
+    try:
+        return float(str(text))
+    except ValueError:
+        return None
 
 
-def elements_as_text_list(xml, name, config: ParserConfig):
+def elements_as_text_list(
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> list[str]:
     """
-    Return one or more child elements of the given XML element as a list of strings.
+    Return one or more child elements of the given XML element as a list of
+    strings.
 
     Parameters
     ----------
@@ -399,23 +436,39 @@ def elements_as_text_list(xml, name, config: ParserConfig):
     Returns
     -------
     :class:`list` of :class:`str`
-        A list of string, where each string corresponds to the text representation of
-        a child element.
-
+        A list of string, where each string corresponds to the text
+        representation of a child element.
     """
+
     if config.clf_namespace_prefix_mapping():
-        return xml.xpath(
+        return xml.xpath(  # pyright: ignore
             f"clf:{name}/text()", namespaces=config.clf_namespace_prefix_mapping()
         )
-    else:
-        return xml.xpath(f"{name}/text()")
+
+    return xml.xpath(f"{name}/text()")  # pyright: ignore
 
 
-def sliding_window(iterable, n):
+def sliding_window(iterable: Iterable, n: int) -> Iterable:
     """
     Collect data into overlapping fixed-length chunks or blocks.
-    Source: https://docs.python.org/3/library/itertools.html
+
+    Parameters
+    ----------
+    iterable
+        Iterable to collect the data from
+    n
+        Chunk size
+
+    Returns
+    -------
+    Generator
+        Chunk generator.
+
+    References
+    ----------
+    -   https://docs.python.org/3/library/itertools.html
     """
+
     it = iter(iterable)
     window = collections.deque(islice(it, n - 1), maxlen=n)
     for x in it:
@@ -423,31 +476,36 @@ def sliding_window(iterable, n):
         yield tuple(window)
 
 
-def three_floats(s: str | None) -> tuple[float, float, float]:
+def three_floats(text: str | None) -> tuple[float, float, float]:
     """
-    Parse the given value as a comma separated list of floating point values.
+    Parse the given text as a comma separated list of floating point values.
 
     Parameters
     ----------
-    s
+    text
         String to parse.
 
     Raises
     ------
-    :class:`ParsingError`
-        If `s` is :py:data:`None`, or cannot be parsed as three floats.
+    :class:`colour_clf_io.errors.ParsingError`
+        If `text` is :py:data:`None`, or cannot be parsed as three floats.
 
     Returns
     -------
     :class:`tuple` of :class:`float`
         Three floating point values.
-
     """
-    if s is None:
-        raise ParsingError(f"Failed to parse three float values from {s}")
-    parts = s.split()
+
+    if text is None:
+        exception = f"Failed to parse three float values from {text}"
+
+        raise ParsingError(exception)
+
+    parts = text.split()
+
     if len(parts) != 3:
-        raise ParsingError(f"Failed to parse three float values from {s}")
-    values = tuple(map(float, parts))
-    # Repacking here to satisfy type check.
-    return values[0], values[1], values[2]
+        exception = f"Failed to parse three float values from {text}"
+
+        raise ParsingError(exception)
+
+    return float(parts[0]), float(parts[1]), float(parts[2])
