@@ -312,6 +312,18 @@ class SOPNode(XMLParsable):
 
         return SOPNode(slope=slope, offset=offset, power=power)
 
+    @classmethod
+    def default(cls) -> Self:
+        """
+        Return the default SOPNode instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+        """
+        return cls(
+            slope=(1.0, 1.0, 1.0),
+            offset=(0.0, 0.0, 0.0),
+            power=(1.0, 1.0, 1.0),
+        )
+
 
 @dataclass
 class SatNode(XMLParsable):
@@ -381,6 +393,14 @@ class SatNode(XMLParsable):
         saturation = float(saturation)
 
         return SatNode(saturation=saturation)
+
+    @classmethod
+    def default(cls) -> Self:
+        """
+        Return the default SatNode instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+        """
+        return cls(saturation=1.0)
 
 
 @dataclass
@@ -619,6 +639,23 @@ class LogParams(XMLParsable):
 
         return LogParams(channel=channel, **attributes)
 
+    @classmethod
+    def default(cls) -> Self:
+        """
+        Return the default LogParams instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+        """
+        return cls(
+            base=2.0,
+            log_side_slope=1.0,
+            log_side_offset=0.0,
+            lin_side_slope=1.0,
+            lin_side_offset=0.0,
+            lin_side_break=None,
+            linear_slope=None,
+            channel=None,
+        )
+
 
 @dataclass
 class ExponentParams(XMLParsable):
@@ -719,3 +756,15 @@ class ExponentParams(XMLParsable):
         channel = map_optional(Channel, xml.get("channel"))
 
         return ExponentParams(channel=channel, exponent=exponent, **attributes)
+
+    @classmethod
+    def default(cls) -> Self:
+        """
+        Return the default ExponentParams instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+        """
+        return cls(
+            exponent=1.0,
+            offset=0.0,
+            channel=None,
+        )
