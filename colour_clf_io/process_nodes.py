@@ -30,7 +30,7 @@ from colour_clf_io.parsing import (
     child_element,
     child_elements,
     element_as_float,
-    element_as_text,
+    elements_as_text_list,
     map_optional,
     retrieve_attributes,
     sliding_window,
@@ -130,7 +130,7 @@ class ProcessNode(XMLParsable, ABC):
     parameter values have been scaled.
     """
 
-    description: str | None
+    description: list[str] | None
     """
     An arbitrary string for describing the function, usage, or notes about the
     *ProcessNode*.
@@ -164,7 +164,7 @@ class ProcessNode(XMLParsable, ABC):
         )
         in_bit_depth = BitDepth(xml.get("inBitDepth"))
         out_bit_depth = BitDepth(xml.get("outBitDepth"))
-        description = element_as_text(xml, "Description", config)
+        description = elements_as_text_list(xml, "Description", config)
 
         return {
             "in_bit_depth": in_bit_depth,
