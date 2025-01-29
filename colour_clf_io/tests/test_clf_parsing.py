@@ -128,7 +128,7 @@ class TestParseCLF:
         assert node.name == "4 Value Lut"
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.i12
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.i12
-        assert node.description == "1D LUT - Turn 4 grey levels into 4 inverted codes"
+        assert node.description == ["1D LUT - Turn 4 grey levels into 4 inverted codes"]
         np.testing.assert_array_almost_equal(
             node.array.as_array(), np.array([3, 2, 1, 0])
         )
@@ -167,7 +167,7 @@ class TestParseCLF:
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.i12
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.interpolation == colour_clf_io.values.Interpolation3D.TRILINEAR
-        assert node.description == "3D LUT"
+        assert node.description == ["3D LUT"]
         np.testing.assert_array_almost_equal(
             node.array.as_array(),
             np.array(
@@ -212,7 +212,7 @@ class TestParseCLF:
         assert node.name == "AP0 to AP1"
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f16
-        assert node.description == "3x3 color space conversion from AP0 to AP1"
+        assert node.description == ["3x3 color space conversion from AP0 to AP1"]
         np.testing.assert_array_almost_equal(
             node.array.as_array(),
             np.array(
@@ -252,7 +252,7 @@ class TestParseCLF:
         assert node.name == "colorspace conversion"
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.i10
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.i10
-        assert node.description == " 3x4 Matrix , 4th column is offset "
+        assert node.description == [" 3x4 Matrix , 4th column is offset "]
         np.testing.assert_array_almost_equal(
             node.array.as_array(),
             np.array(
@@ -306,7 +306,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.i10
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.i10
-        assert node.description == "10-bit full range to SMPTE range"
+        assert node.description == ["10-bit full range to SMPTE range"]
         assert node.min_in_value == 0.0
         assert node.min_out_value == 64.0
         assert node.max_out_value == 940.0
@@ -334,7 +334,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f16
-        assert node.description == "Base 10 Logarithm"
+        assert node.description == ["Base 10 Logarithm"]
         assert node.style == colour_clf_io.values.LogStyle.LOG_10
         assert node.log_params == []
 
@@ -364,7 +364,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
-        assert node.description == "Linear to DJI D-Log"
+        assert node.description == ["Linear to DJI D-Log"]
         assert node.style == colour_clf_io.values.LogStyle.CAMERA_LIN_TO_LOG
         assert node.log_params[0].base is not None
         np.testing.assert_allclose(node.log_params[0].base, 10.0)
@@ -405,7 +405,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
-        assert node.description == "Basic 2.2 Gamma"
+        assert node.description == ["Basic 2.2 Gamma"]
         assert node.style == colour_clf_io.values.ExponentStyle.BASIC_FWD
         np.testing.assert_allclose(node.exponent_params[0].exponent, 2.2)
 
@@ -433,7 +433,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
-        assert node.description == "EOTF (sRGB)"
+        assert node.description == ["EOTF (sRGB)"]
         assert node.style, colour_clf_io.values.ExponentStyle.MON_CURVE_FWD
         assert node.exponent_params[0].exponent is not None
         np.testing.assert_allclose(node.exponent_params[0].exponent, 2.4)
@@ -464,7 +464,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
-        assert node.description == "CIE L*"
+        assert node.description == ["CIE L*"]
         assert node.style == colour_clf_io.values.ExponentStyle.MON_CURVE_REV
         assert node.exponent_params[0].exponent is not None
         np.testing.assert_allclose(node.exponent_params[0].exponent, 3.0)
@@ -495,7 +495,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f32
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f32
-        assert node.description == "Rec. 709 OETF"
+        assert node.description == ["Rec. 709 OETF"]
         assert node.style == colour_clf_io.values.ExponentStyle.MON_CURVE_REV
         assert node.exponent_params[0].exponent is not None
         np.testing.assert_allclose(node.exponent_params[0].exponent, 2.2222222222222222)
@@ -533,7 +533,7 @@ class TestParseCLF:
         assert node.name is None
         assert node.in_bit_depth == colour_clf_io.values.BitDepth.f16
         assert node.out_bit_depth == colour_clf_io.values.BitDepth.f16
-        assert node.description == "scene 1 exterior look"
+        assert node.description == ["scene 1 exterior look"]
         assert node.style == colour_clf_io.values.ASC_CDLStyle.FWD
         assert node.sopnode is not None
         assert node.sopnode.slope == (1.000000, 1.000000, 0.900000)

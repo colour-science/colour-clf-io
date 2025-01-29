@@ -427,12 +427,8 @@ def elements_as_text_list(
         representation of a child element.
     """
 
-    if config.clf_namespace_prefix_mapping():
-        return xml.xpath(  # pyright: ignore
-            f"clf:{name}/text()", namespaces=config.clf_namespace_prefix_mapping()
-        )
-
-    return xml.xpath(f"{name}/text()")  # pyright: ignore
+    elements = child_elements(xml, name, config)
+    return [element.text for element in elements if element.text is not None]
 
 
 def sliding_window(iterable: Iterable, n: int) -> Iterable:
