@@ -235,8 +235,8 @@ def check_none(value: T | None, message: str) -> TypeGuard[T]:
 
 
 def child_element(
-    xml, name, config: ParserConfig
-) -> xml.etree.ElementTree.Element | None:
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> lxml.etree._Element | None:
     """
     Return a named child element of the given XML element.
 
@@ -274,8 +274,8 @@ def child_element(
 
 
 def child_elements(
-    xml, name, config: ParserConfig
-) -> list[xml.etree.ElementTree.Element]:
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> list[lxml.etree._Element]:
     """
     Return all child elements with a given name of an XML element.
 
@@ -482,16 +482,15 @@ def three_floats(text: str | None) -> tuple[float, float, float]:
     :class:`tuple` of :class:`float`
         Three floating point values.
     """
+    exception = f"Failed to parse three float values from {text}"
 
     if text is None:
-        exception = f"Failed to parse three float values from {text}"
-
         raise ParsingError(exception)
 
     parts = text.split()
 
     if len(parts) != 3:
-        raise ParsingError(f"Failed to parse three float values from {s}")
+        raise ParsingError(exception)
     values = tuple(map(float, parts))
     # Note: Repacking here to satisfy type check.
     return values[0], values[1], values[2]

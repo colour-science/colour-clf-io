@@ -313,7 +313,7 @@ class SOPNode(XMLParsable):
         return SOPNode(slope=slope, offset=offset, power=power)
 
     @classmethod
-    def default(cls) -> Self:
+    def default(cls) -> SOPNode:
         """
         Return the default SOPNode instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
@@ -395,7 +395,7 @@ class SatNode(XMLParsable):
         return SatNode(saturation=saturation)
 
     @classmethod
-    def default(cls) -> Self:
+    def default(cls) -> SatNode:
         """
         Return the default SatNode instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
@@ -504,7 +504,7 @@ class Info(XMLParsable):
             },
         )
         calibration_info = CalibrationInfo.from_xml(
-            child_element(xml, "CalibrationInfo", config),  # pyright: ignore
+            child_element(xml, "CalibrationInfo", config),
             config,
         )
 
@@ -640,7 +640,7 @@ class LogParams(XMLParsable):
         return LogParams(channel=channel, **attributes)
 
     @classmethod
-    def default(cls) -> Self:
+    def default(cls) -> LogParams:
         """
         Return the default LogParams instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
@@ -758,7 +758,7 @@ class ExponentParams(XMLParsable):
         return ExponentParams(channel=channel, exponent=exponent, **attributes)
 
     @classmethod
-    def default(cls) -> Self:
+    def default(cls) -> ExponentParams:
         """
         Return the default ExponentParams instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
