@@ -317,6 +317,11 @@ class SOPNode(XMLParsable):
         """
         Return the default SOPNode instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.SOPNode`
+            Parsed XML node.
         """
         return cls(
             slope=(1.0, 1.0, 1.0),
@@ -399,6 +404,11 @@ class SatNode(XMLParsable):
         """
         Return the default SatNode instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.SatNode`
+            Parsed XML node.
         """
         return cls(saturation=1.0)
 
@@ -644,6 +654,11 @@ class LogParams(XMLParsable):
         """
         Return the default LogParams instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.LogParams`
+            Parsed XML node.
         """
         return cls(
             base=2.0,
@@ -762,6 +777,12 @@ class ExponentParams(XMLParsable):
         """
         Return the default ExponentParams instance. Contains the default values that
         should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.ExponentParams`
+            Parsed XML node.
+
         """
         return cls(
             exponent=1.0,
