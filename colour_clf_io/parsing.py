@@ -235,8 +235,8 @@ def check_none(value: T | None, message: str) -> TypeGuard[T]:
 
 
 def child_element(
-    xml: lxml.etree._Element, name: str, config: ParserConfig, xpath_function: str = ""
-) -> lxml.etree._Element | str | None:
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> lxml.etree._Element | None:
     """
     Return a named child element of the given XML element.
 
@@ -248,8 +248,6 @@ def child_element(
         Name of the child element to look for.
     config
         Additional parser configuration.
-    xpath_function
-        Optional XPath function to evaluate on the child element.
 
     Returns
     -------
@@ -258,7 +256,7 @@ def child_element(
         :py:data:`None` if the child was not found.
     """
 
-    elements = child_elements(xml, name, config, xpath_function)
+    elements = child_elements(xml, name, config)
     element_count = len(elements)
 
     if element_count == 0:
@@ -276,8 +274,8 @@ def child_element(
 
 
 def child_elements(
-    xml: lxml.etree._Element, name: str, config: ParserConfig, xpath_function: str = ""
-) -> list[lxml.etree._Element] | list[str]:
+    xml: lxml.etree._Element, name: str, config: ParserConfig
+) -> list[lxml.etree._Element]:
     """
     Return all child elements with a given name of an XML element.
 
@@ -289,8 +287,6 @@ def child_elements(
         Name of the child element to look for.
     config
         Additional parser configuration.
-    xpath_function
-        Optional XPath function to evaluate on the child element.
 
     Returns
     -------
@@ -301,11 +297,11 @@ def child_elements(
 
     if config.clf_namespace_prefix_mapping():
         elements = xml.xpath(
-            f"clf:{name}{xpath_function}",
+            f"clf:{name}",
             namespaces=config.clf_namespace_prefix_mapping(),
         )
     else:
-        elements = xml.xpath(f"{name}{xpath_function}")
+        elements = xml.xpath(f"{name}")
 
     return elements  # pyright: ignore
 
@@ -325,8 +321,6 @@ def child_element_or_exception(
         Name of the child element to look for.
     config
         Additional parser configuration.
-    xpath_function
-        Optional XPath function to evaluate on the child element.
 
     Raises
     ------
@@ -339,12 +333,6 @@ def child_element_or_exception(
     """
 
     element = child_element(xml, name, config)
-
-    if isinstance(element, str):
-        exception = f'Element "{element}" cannot be a string!'
-
-        raise TypeError(exception)
-
     if element is None:
         exception = (
             f"Tried to retrieve child element '{name}' from '{xml}' but child was "
@@ -376,12 +364,12 @@ def element_as_text(xml: lxml.etree._Element, name: str, config: ParserConfig) -
         an empty string is returned.
     """
 
-    text = child_element(xml, name, config, xpath_function="/text()")
+    element = child_element(xml, name, config)
 
-    if text is None:
+    if element is None:
         return ""
 
-    return str(text)
+    return str(element.text)
 
 
 def element_as_float(
@@ -406,8 +394,7 @@ def element_as_float(
         an invalid float representation, ``None`` is returned.
     """
 
-    text = child_element(xml, name, config, xpath_function="/text()")
-
+    text = element_as_text(xml, name, config)
     if text is None:
         return None
 
@@ -440,12 +427,8 @@ def elements_as_text_list(
         representation of a child element.
     """
 
-    if config.clf_namespace_prefix_mapping():
-        return xml.xpath(  # pyright: ignore
-            f"clf:{name}/text()", namespaces=config.clf_namespace_prefix_mapping()
-        )
-
-    return xml.xpath(f"{name}/text()")  # pyright: ignore
+    elements = child_elements(xml, name, config)
+    return [element.text for element in elements if element.text is not None]
 
 
 def sliding_window(iterable: Iterable, n: int) -> Iterable:
@@ -495,17 +478,15 @@ def three_floats(text: str | None) -> tuple[float, float, float]:
     :class:`tuple` of :class:`float`
         Three floating point values.
     """
+    exception = f"Failed to parse three float values from {text}"
 
     if text is None:
-        exception = f"Failed to parse three float values from {text}"
-
         raise ParsingError(exception)
 
     parts = text.split()
 
     if len(parts) != 3:
-        exception = f"Failed to parse three float values from {text}"
-
         raise ParsingError(exception)
-
-    return float(parts[0]), float(parts[1]), float(parts[2])
+    values = tuple(map(float, parts))
+    # Note: Repacking here to satisfy type check.
+    return values[0], values[1], values[2]

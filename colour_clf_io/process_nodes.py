@@ -30,7 +30,7 @@ from colour_clf_io.parsing import (
     child_element,
     child_elements,
     element_as_float,
-    element_as_text,
+    elements_as_text_list,
     map_optional,
     retrieve_attributes,
     sliding_window,
@@ -130,7 +130,7 @@ class ProcessNode(XMLParsable, ABC):
     parameter values have been scaled.
     """
 
-    description: str | None
+    description: list[str] | None
     """
     An arbitrary string for describing the function, usage, or notes about the
     *ProcessNode*.
@@ -164,7 +164,7 @@ class ProcessNode(XMLParsable, ABC):
         )
         in_bit_depth = BitDepth(xml.get("inBitDepth"))
         out_bit_depth = BitDepth(xml.get("outBitDepth"))
-        description = element_as_text(xml, "Description", config)
+        description = elements_as_text_list(xml, "Description", config)
 
         return {
             "in_bit_depth": in_bit_depth,
@@ -312,7 +312,7 @@ class LUT1D(ProcessNode):
             return None
 
         super_args = ProcessNode.parse_attributes(xml, config)
-        array = Array.from_xml(child_element(xml, "Array", config), config)  # pyright: ignore
+        array = Array.from_xml(child_element(xml, "Array", config), config)
 
         if array is None:
             exception = "LUT1D processing node does not have an Array element."
@@ -380,7 +380,7 @@ class LUT3D(ProcessNode):
             return None
 
         super_args = ProcessNode.parse_attributes(xml, config)
-        array = Array.from_xml(child_element(xml, "Array", config), config)  # pyright: ignore
+        array = Array.from_xml(child_element(xml, "Array", config), config)
 
         if array is None:
             exception = "LUT3D processing node does not have an Array element."
@@ -448,7 +448,7 @@ class Matrix(ProcessNode):
             return None
 
         super_args = ProcessNode.parse_attributes(xml, config)
-        array = Array.from_xml(child_element(xml, "Array", config), config)  # pyright: ignore
+        array = Array.from_xml(child_element(xml, "Array", config), config)
 
         if array is None:
             exception = "Matrix processing node does not have an Array element."
@@ -584,7 +584,7 @@ class Log(ProcessNode):
         params = [
             param
             for param in [
-                LogParams.from_xml(param_element, config)  # pyright: ignore
+                LogParams.from_xml(param_element, config)
                 for param_element in param_elements
             ]
             if param is not None
@@ -653,7 +653,7 @@ class Exponent(ProcessNode):
         params = [
             param
             for param in [
-                ExponentParams.from_xml(param_element, config)  # pyright: ignore
+                ExponentParams.from_xml(param_element, config)
                 for param_element in param_elements
             ]
             if param is not None
@@ -718,7 +718,7 @@ class ASC_CDL(ProcessNode):
 
         super_args = ProcessNode.parse_attributes(xml, config)
         style = ASC_CDLStyle(xml.get("style"))
-        sop_node = SOPNode.from_xml(child_element(xml, "SOPNode", config), config)  # pyright: ignore
-        sat_node = SatNode.from_xml(child_element(xml, "SatNode", config), config)  # pyright: ignore
+        sop_node = SOPNode.from_xml(child_element(xml, "SOPNode", config), config)
+        sat_node = SatNode.from_xml(child_element(xml, "SatNode", config), config)
 
         return ASC_CDL(style=style, sopnode=sop_node, sat_node=sat_node, **super_args)

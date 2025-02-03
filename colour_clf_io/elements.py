@@ -312,6 +312,23 @@ class SOPNode(XMLParsable):
 
         return SOPNode(slope=slope, offset=offset, power=power)
 
+    @classmethod
+    def default(cls) -> SOPNode:
+        """
+        Return the default SOPNode instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.SOPNode`
+            Parsed XML node.
+        """
+        return cls(
+            slope=(1.0, 1.0, 1.0),
+            offset=(0.0, 0.0, 0.0),
+            power=(1.0, 1.0, 1.0),
+        )
+
 
 @dataclass
 class SatNode(XMLParsable):
@@ -381,6 +398,19 @@ class SatNode(XMLParsable):
         saturation = float(saturation)
 
         return SatNode(saturation=saturation)
+
+    @classmethod
+    def default(cls) -> SatNode:
+        """
+        Return the default SatNode instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.SatNode`
+            Parsed XML node.
+        """
+        return cls(saturation=1.0)
 
 
 @dataclass
@@ -484,7 +514,7 @@ class Info(XMLParsable):
             },
         )
         calibration_info = CalibrationInfo.from_xml(
-            child_element(xml, "CalibrationInfo", config),  # pyright: ignore
+            child_element(xml, "CalibrationInfo", config),
             config,
         )
 
@@ -619,6 +649,28 @@ class LogParams(XMLParsable):
 
         return LogParams(channel=channel, **attributes)
 
+    @classmethod
+    def default(cls) -> LogParams:
+        """
+        Return the default LogParams instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.LogParams`
+            Parsed XML node.
+        """
+        return cls(
+            base=2.0,
+            log_side_slope=1.0,
+            log_side_offset=0.0,
+            lin_side_slope=1.0,
+            lin_side_offset=0.0,
+            lin_side_break=None,
+            linear_slope=None,
+            channel=None,
+        )
+
 
 @dataclass
 class ExponentParams(XMLParsable):
@@ -719,3 +771,21 @@ class ExponentParams(XMLParsable):
         channel = map_optional(Channel, xml.get("channel"))
 
         return ExponentParams(channel=channel, exponent=exponent, **attributes)
+
+    @classmethod
+    def default(cls) -> ExponentParams:
+        """
+        Return the default ExponentParams instance. Contains the default values that
+        should be used per specification in case the actual value is not provided.
+
+        Returns
+        -------
+        class:`colour_clf_io.ExponentParams`
+            Parsed XML node.
+
+        """
+        return cls(
+            exponent=1.0,
+            offset=0.0,
+            channel=None,
+        )
