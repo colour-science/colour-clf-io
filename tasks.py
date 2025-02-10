@@ -500,7 +500,8 @@ def tag(ctx: Context,  remote_name: str = "upstream") -> None:
         remote_tags = result.stdout.strip().split("\n")  # pyright: ignore
         tags = set()
         for remote_tag in remote_tags:
-            tags.add(remote_tag.split("refs/tags/")[1].replace("refs/tags/", "^{}"))
+            if remote_tag:
+                tags.add(remote_tag.split("refs/tags/")[1].replace("refs/tags/", "^{}"))
         version_tags = sorted(tags)
         if f"v{version}" in version_tags:
             msg = (
