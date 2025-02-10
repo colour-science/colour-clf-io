@@ -459,7 +459,7 @@ def virtualise(ctx: Context, tests: bool = True) -> None:
 
 
 @task
-def tag(ctx: Context) -> None:
+def tag(ctx: Context,  remote_name: str = "upstream") -> None:
     """
     Tag the repository according to defined version using *git-flow*.
 
@@ -496,7 +496,7 @@ def tag(ctx: Context) -> None:
 
         version = f"{major_version}.{minor_version}.{change_version}"
 
-        result = ctx.run("git ls-remote --tags upstream", hide="both")
+        result = ctx.run(f"git ls-remote --tags {remote_name}", hide="both")
         remote_tags = result.stdout.strip().split("\n")  # pyright: ignore
         tags = set()
         for remote_tag in remote_tags:
