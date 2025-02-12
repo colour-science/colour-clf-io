@@ -459,7 +459,7 @@ def virtualise(ctx: Context, tests: bool = True) -> None:
 
 
 @task
-def tag(ctx: Context,  remote_name: str = "upstream") -> None:
+def tag(ctx: Context, remote_name: str = "upstream") -> None:
     """
     Tag the repository according to defined version using *git-flow*.
 
@@ -467,6 +467,9 @@ def tag(ctx: Context,  remote_name: str = "upstream") -> None:
     ----------
     ctx
         Context.
+
+    remote_name
+        Name of the remote repository in the local git repository.
     """
 
     message_box("Tagging...")
