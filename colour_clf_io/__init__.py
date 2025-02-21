@@ -104,7 +104,7 @@ __change_version__ = "1"
 __version__ = f"{__major_version__}.{__minor_version__}.{__change_version__}"
 
 
-def read_clf(path: str | Path) -> ProcessList | None:
+def read_clf(path: str | Path) -> ProcessList:
     """
     Read given *CLF* file and return a *ProcessList*.
 
