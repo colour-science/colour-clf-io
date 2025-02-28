@@ -18,8 +18,7 @@ if typing.TYPE_CHECKING:
     from collections.abc import Callable, Iterable
     from typing import Any
 
-if typing.TYPE_CHECKING:
-    import lxml.etree
+import lxml.etree
 
 from colour_clf_io.errors import ParsingError
 
@@ -34,6 +33,7 @@ __all__ = [
     "NAMESPACE_NAME",
     "ParserConfig",
     "XMLParsable",
+    "XMLWritable",
     "map_optional",
     "retrieve_attributes",
     "retrieve_attributes_as_float",
@@ -117,6 +117,29 @@ class XMLParsable(ABC):
         -------
         :class:`colour_clf_io.parsing.XMLParsable` or :py:data:`None`
             Parsed object or ``None`` if parsing failed.
+        """
+
+
+class XMLWritable(ABC):
+    """
+    Define the base class for objects that can be serialised to XML.
+
+    This is an :class:`ABCMeta` abstract class that must be inherited by
+    sub-classes.
+
+    Methods
+    -------
+    -   :meth:`~colour_lf_io.parsing.XMLParsable.to_xml`
+    """
+
+    @abstractmethod
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
         """
 
 
@@ -490,3 +513,14 @@ def three_floats(text: str | None) -> tuple[float, float, float]:
     values = tuple(map(float, parts))
     # Note: Repacking here to satisfy type check.
     return values[0], values[1], values[2]
+
+
+def set_attr_if_not_none(node: lxml.etree._Element, attr: str, value: Any) -> None:
+    if value is not None:
+        node.set(attr, str(value))
+
+
+def set_element_if_not_none(node: lxml.etree._Element, name: str, value: Any) -> None:
+    if value is not None and value != "":
+        child = lxml.etree.SubElement(node, name)
+        child.text = str(value)

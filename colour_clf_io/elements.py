@@ -8,25 +8,28 @@ typically are child elements of *Process* Nodes.
 
 from __future__ import annotations
 
+import itertools
 import typing
 from dataclasses import dataclass
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
 
-if typing.TYPE_CHECKING:
-    import lxml.etree
+import lxml.etree
 
 from colour_clf_io.errors import ParsingError
 from colour_clf_io.parsing import (
     ParserConfig,
     XMLParsable,
+    XMLWritable,
     check_none,
     child_element,
     child_element_or_exception,
     map_optional,
     retrieve_attributes,
     retrieve_attributes_as_float,
+    set_attr_if_not_none,
+    set_element_if_not_none,
     three_floats,
 )
 from colour_clf_io.values import Channel
@@ -50,7 +53,7 @@ __all__ = [
 
 
 @dataclass
-class Array(XMLParsable):
+class Array(XMLParsable, XMLWritable):
     """
     Represent an *Array* element.
 
@@ -124,6 +127,27 @@ class Array(XMLParsable):
 
         return Array(values=values, dim=dimensions)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("Array")
+        xml.set("dim", " ".join(map(str, self.dim)))
+        if len(self.dim) <= 1:
+            xml.text = "\n".join(map(str, self.values))
+        else:
+            row_length = self.dim[-1]
+            text = "\n".join(
+                " ".join(map(str, row))
+                for row in itertools.batched(self.values, row_length)
+            )
+            xml.text = text
+        return xml
+
     def as_array(self) -> npt.NDArray:
         """
         Convert the *CLF* element into a numpy array.
@@ -144,7 +168,7 @@ class Array(XMLParsable):
 
 
 @dataclass
-class CalibrationInfo(XMLParsable):
+class CalibrationInfo(XMLParsable, XMLWritable):
     """
     Represent a *CalibrationInfo* container element for a
     :class:`colour_clf_io.ProcessList` class instance.
@@ -227,9 +251,32 @@ class CalibrationInfo(XMLParsable):
 
         return CalibrationInfo(**attributes)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("CalibrationInfo")
+        set_attr_if_not_none(
+            xml, "DisplayDeviceSerialNum", self.display_device_serial_num
+        )
+        set_attr_if_not_none(
+            xml, "DisplayDeviceHostName", self.display_device_host_name
+        )
+        set_attr_if_not_none(xml, "OperatorName", self.operator_name)
+        set_attr_if_not_none(xml, "CalibrationDateTime", self.calibration_date_time)
+        set_attr_if_not_none(xml, "MeasurementProbe", self.measurement_probe)
+        set_attr_if_not_none(
+            xml, "CalibrationSoftwareName", self.calibration_software_name
+        )
+        return xml
+
 
 @dataclass
-class SOPNode(XMLParsable):
+class SOPNode(XMLParsable, XMLWritable):
     """
     Represent a *SOPNode* element for a :class:`colour_clf_io.ASC_CDL`
     *Process Node*.
@@ -312,6 +359,20 @@ class SOPNode(XMLParsable):
 
         return SOPNode(slope=slope, offset=offset, power=power)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("SOPNode")
+        set_element_if_not_none(xml, "Slope", " ".join(map(str, self.slope)))
+        set_element_if_not_none(xml, "Offset", " ".join(map(str, self.offset)))
+        set_element_if_not_none(xml, "Power", " ".join(map(str, self.power)))
+        return xml
+
     @classmethod
     def default(cls) -> SOPNode:
         """
@@ -331,7 +392,7 @@ class SOPNode(XMLParsable):
 
 
 @dataclass
-class SatNode(XMLParsable):
+class SatNode(XMLParsable, XMLWritable):
     """
     Represent a *SatNode* element for a :class:`colour_clf_io.ASC_CDL`
     *Process Node*.
@@ -399,6 +460,18 @@ class SatNode(XMLParsable):
 
         return SatNode(saturation=saturation)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("SatNode")
+        set_element_if_not_none(xml, "Saturation", self.saturation)
+        return xml
+
     @classmethod
     def default(cls) -> SatNode:
         """
@@ -414,7 +487,7 @@ class SatNode(XMLParsable):
 
 
 @dataclass
-class Info(XMLParsable):
+class Info(XMLParsable, XMLWritable):
     """
     Represent an *Info* element.
 
@@ -520,9 +593,27 @@ class Info(XMLParsable):
 
         return Info(calibration_info=calibration_info, **attributes)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("Info")
+        set_attr_if_not_none(xml, "AppRelease", self.app_release)
+        set_attr_if_not_none(xml, "Copyright", self.copyright)
+        set_attr_if_not_none(xml, "Revision", self.revision)
+        set_attr_if_not_none(xml, "AcesTransformID", self.aces_transform_id)
+        set_attr_if_not_none(xml, "AcesUserName", self.aces_user_name)
+        if self.calibration_info is not None:
+            xml.append(self.calibration_info.to_xml())
+        return xml
+
 
 @dataclass
-class LogParams(XMLParsable):
+class LogParams(XMLParsable, XMLWritable):
     """
     Represent a *LogParams* element for a :class:`colour_clf_io.Log`
     *Process Node*.
@@ -649,6 +740,26 @@ class LogParams(XMLParsable):
 
         return LogParams(channel=channel, **attributes)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("LogParams")
+        set_attr_if_not_none(xml, "base", self.base)
+        set_attr_if_not_none(xml, "logSideSlope", self.log_side_slope)
+        set_attr_if_not_none(xml, "logSideOffset", self.log_side_offset)
+        set_attr_if_not_none(xml, "linSideSlope", self.lin_side_slope)
+        set_attr_if_not_none(xml, "linSideOffset", self.lin_side_offset)
+        set_attr_if_not_none(xml, "linSideBreak", self.lin_side_break)
+        set_attr_if_not_none(xml, "linearSlope", self.linear_slope)
+        if self.channel is not None:
+            xml.set("channel", self.channel.value)
+        return xml
+
     @classmethod
     def default(cls) -> LogParams:
         """
@@ -673,7 +784,7 @@ class LogParams(XMLParsable):
 
 
 @dataclass
-class ExponentParams(XMLParsable):
+class ExponentParams(XMLParsable, XMLWritable):
     """
     Represent a *ExponentParams* element for a :class:`colour_clf_io.Exponent`
     *Process Node*.
@@ -771,6 +882,21 @@ class ExponentParams(XMLParsable):
         channel = map_optional(Channel, xml.get("channel"))
 
         return ExponentParams(channel=channel, exponent=exponent, **attributes)
+
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("ExponentParams")
+        set_attr_if_not_none(xml, "exponent", self.exponent)
+        set_attr_if_not_none(xml, "offset", self.offset)
+        if self.channel is not None:
+            xml.set("channel", self.channel.value)
+        return xml
 
     @classmethod
     def default(cls) -> ExponentParams:

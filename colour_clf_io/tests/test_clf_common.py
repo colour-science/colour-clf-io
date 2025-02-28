@@ -37,7 +37,7 @@ EXAMPLE_WRAPPER: str = """
 """.strip()
 
 
-def wrap_snippet(snippet: str) -> str:
+def wrap_snippet(snippet: str | bytes) -> str:
     """
     Take a string that should contain the text representation of a *CLF* node, and
     returns valid *CLF* file. Essentially the given string is pasted into the
