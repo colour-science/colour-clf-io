@@ -8,7 +8,7 @@ typically are child elements of *Process* Nodes.
 
 from __future__ import annotations
 
-import itertools
+import sys
 import typing
 from dataclasses import dataclass
 
@@ -50,6 +50,21 @@ __all__ = [
     "LogParams",
     "ExponentParams",
 ]
+
+if sys.version_info >= (3, 12):
+    from itertools import batched
+else:
+    from itertools import islice
+
+    T = typing.TypeVar("T")
+
+    def batched(iterable: typing.Iterable[T], n: int) -> typing.Iterator[tuple[T, ...]]:
+        if n < 1:
+            err = "n must be at least one"
+            raise ValueError(err)
+        it = iter(iterable)
+        while batch := tuple(islice(it, n)):
+            yield batch
 
 
 @dataclass
@@ -142,8 +157,7 @@ class Array(XMLParsable, XMLWritable):
         else:
             row_length = self.dim[-1]
             text = "\n".join(
-                " ".join(map(str, row))
-                for row in itertools.batched(self.values, row_length)
+                " ".join(map(str, row)) for row in batched(self.values, row_length)
             )
             xml.text = text
         return xml
