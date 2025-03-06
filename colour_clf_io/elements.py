@@ -152,14 +152,18 @@ class Array(XMLParsable, XMLWritable):
         """
         xml = lxml.etree.Element("Array")
         xml.set("dim", " ".join(map(str, self.dim)))
+
+        def wrap_with_newlines(s: str) -> str:
+            return f"\n{s}\n"
+
         if len(self.dim) <= 1:
-            xml.text = "\n".join(map(str, self.values))
+            text = "\n".join(map(str, self.values))
         else:
             row_length = self.dim[-1]
             text = "\n".join(
                 " ".join(map(str, row)) for row in batched(self.values, row_length)
             )
-            xml.text = text
+        xml.text = wrap_with_newlines(text)
         return xml
 
     def as_array(self) -> npt.NDArray:

@@ -15,6 +15,7 @@ from _warnings import warn
 from colour_clf_io.elements import Info
 from colour_clf_io.errors import ParsingError
 from colour_clf_io.parsing import (
+    NAMESPACE_NAME,
     ParserConfig,
     check_none,
     element_as_text,
@@ -212,12 +213,16 @@ class ProcessList:
         :class:`lxml.etree._Element`
         """
         xml = lxml.etree.Element("ProcessList")
+
+        xml.set("xmlns", NAMESPACE_NAME)
+
         set_attr_if_not_none(xml, "id", self.id)
         set_attr_if_not_none(xml, "compCLFversion", self.compatible_CLF_version)
         set_attr_if_not_none(xml, "name", self.name)
         set_attr_if_not_none(xml, "inverseOf", self.inverse_of)
         set_element_if_not_none(xml, "InputDescriptor", self.input_descriptor)
         set_element_if_not_none(xml, "OutputDescriptor", self.output_descriptor)
+
         if self.info:
             xml.append(self.info.to_xml())
         for description_text in self.description:
