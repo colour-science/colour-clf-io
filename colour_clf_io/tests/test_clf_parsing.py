@@ -11,7 +11,7 @@ import pytest
 import colour_clf_io.elements
 import colour_clf_io.process_nodes
 import colour_clf_io.values
-from colour_clf_io import parse_clf, read_clf
+from colour_clf_io import read_clf, read_clf_from_file
 from colour_clf_io.errors import ParsingError
 
 from .test_clf_common import wrap_snippet
@@ -49,7 +49,9 @@ class TestParseCLF:
         Test parsing of the sample file `ACES2065_1_to_ACEScct.xml`.
         """
 
-        clf_data = read_clf(os.path.join(ROOT_CLF, "ACES2065_1_to_ACEScct.xml"))
+        clf_data = read_clf_from_file(
+            os.path.join(ROOT_CLF, "ACES2065_1_to_ACEScct.xml")
+        )
 
         assert clf_data is not None
         assert clf_data.description == ["Conversion from linear ACES2065-1 to ACEScct"]
@@ -76,7 +78,7 @@ class TestParseCLF:
         Test parsing of the sample file `LMT Kodak 2383 Print Emulation.xml`.
         """
 
-        clf_data = read_clf(
+        clf_data = read_clf_from_file(
             os.path.join(ROOT_CLF, "LMT Kodak 2383 Print Emulation.xml")
         )
 
@@ -91,7 +93,9 @@ class TestParseCLF:
         Test parsing of the sample file `LMT_ARRI_K1S1_709_EI800_v3.xml`.
         """
 
-        clf_data = read_clf(os.path.join(ROOT_CLF, "LMT_ARRI_K1S1_709_EI800_v3.xml"))
+        clf_data = read_clf_from_file(
+            os.path.join(ROOT_CLF, "LMT_ARRI_K1S1_709_EI800_v3.xml")
+        )
 
         assert clf_data is not None
         assert clf_data.description == ["An ARRI based look"]
@@ -117,7 +121,7 @@ class TestParseCLF:
         </LUT1D>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -155,7 +159,7 @@ class TestParseCLF:
         </LUT3D>
         """  # noqa: E501
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -201,7 +205,7 @@ class TestParseCLF:
         </Matrix>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -241,7 +245,7 @@ class TestParseCLF:
         </Matrix>
         """  # noqa: E501
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -295,7 +299,7 @@ class TestParseCLF:
         </Range>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -323,7 +327,7 @@ class TestParseCLF:
         </Log>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -353,7 +357,7 @@ class TestParseCLF:
         </Log>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -394,7 +398,7 @@ class TestParseCLF:
         </Exponent>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -422,7 +426,7 @@ class TestParseCLF:
         </Exponent>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -453,7 +457,7 @@ class TestParseCLF:
         </Exponent>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -484,7 +488,7 @@ class TestParseCLF:
         </Exponent>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -522,7 +526,7 @@ class TestParseCLF:
         </ASC_CDL>
         """
 
-        doc = parse_clf(wrap_snippet(example))
+        doc = read_clf(wrap_snippet(example))
 
         assert doc is not None
 
@@ -571,7 +575,7 @@ class TestParseCLF:
         </ProcessList>
         """
 
-        doc = parse_clf(example)
+        doc = read_clf(example)
 
         assert doc is not None
 
@@ -610,7 +614,7 @@ class TestParseCLF:
         </ProcessList>
         """  # noqa: E501
 
-        doc = parse_clf(example)
+        doc = read_clf(example)
 
         assert doc is not None
 
@@ -653,7 +657,7 @@ class TestParseCLF:
         </ProcessList>
         """
 
-        doc = parse_clf(example)
+        doc = read_clf(example)
 
         assert doc is not None
 
@@ -676,7 +680,7 @@ class TestParseCLF:
         </ProcessList>
         """
 
-        pytest.raises(ParsingError, parse_clf, example)
+        pytest.raises(ParsingError, read_clf, example)
 
     @pytest.mark.with_ocio
     def test_CLF_from_OCIO(self) -> None:
@@ -693,7 +697,7 @@ class TestParseCLF:
         )
         clf_text = ocio_transform.write("Academy/ASC Common LUT Format").encode()
 
-        doc = parse_clf(clf_text)
+        doc = read_clf(clf_text)
 
         assert doc is not None
 

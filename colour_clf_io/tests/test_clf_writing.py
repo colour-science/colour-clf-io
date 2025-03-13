@@ -8,7 +8,7 @@ import os
 import colour_clf_io.elements
 import colour_clf_io.process_nodes
 import colour_clf_io.values
-from colour_clf_io import parse_clf, write_clf
+from colour_clf_io import read_clf, write_clf
 
 from .test_clf_common import wrap_snippet
 
@@ -46,11 +46,11 @@ def assert_valid_roundtrip_for_file(path: str) -> None:
 
 
 def assert_valid_roundtrip_for_doc(doc: str) -> None:
-    doc_original = parse_clf(doc)
+    doc_original = read_clf(doc)
     assert doc_original is not None
     xml = write_clf(doc_original)
     assert xml is not None
-    doc_after_roundtrip = parse_clf(xml)
+    doc_after_roundtrip = read_clf(xml)
     assert doc_original == doc_after_roundtrip
 
 
@@ -323,7 +323,7 @@ class TestWriteCLF:
         </ProcessList>
         """
 
-        doc = parse_clf(example)
+        doc = read_clf(example)
 
         assert doc is not None
 
@@ -362,7 +362,7 @@ class TestWriteCLF:
         </ProcessList>
         """  # noqa: E501
 
-        doc = parse_clf(example)
+        doc = read_clf(example)
 
         assert doc is not None
 
@@ -405,7 +405,7 @@ class TestWriteCLF:
         </ProcessList>
         """
 
-        doc = parse_clf(example)
+        doc = read_clf(example)
 
         assert doc is not None
 

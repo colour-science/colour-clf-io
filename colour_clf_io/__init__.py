@@ -104,7 +104,7 @@ __change_version__ = "1"
 __version__ = f"{__major_version__}.{__minor_version__}.{__change_version__}"
 
 
-def read_clf(path: str | Path) -> ProcessList:
+def read_clf_from_file(path: str | Path) -> ProcessList:
     """
     Read given *CLF* file and return a *ProcessList*.
 
@@ -134,7 +134,7 @@ def read_clf(path: str | Path) -> ProcessList:
     return process_list
 
 
-def parse_clf(text: str | bytes) -> ProcessList | None:
+def read_clf(text: str | bytes) -> ProcessList | None:
     """
     Read given string as a *CLF* file and return a *ProcessList*.
 

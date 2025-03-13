@@ -80,7 +80,7 @@ def snippet_to_process_list(
 
     doc = wrap_snippet(snippet)
 
-    return colour_clf_io.parse_clf(doc)
+    return colour_clf_io.read_clf(doc)
 
 
 def snippet_as_tmp_file(snippet: str) -> str:
