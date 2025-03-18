@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 import colour_clf_io as clf
-from colour_clf_io.processing import apply
+from colour_clf_io.processing import CLFProcessList
 
 __all__ = [
     "assert_ocio_consistency",
@@ -19,6 +19,7 @@ __all__ = [
 ]
 
 from colour.hints import NDArrayFloat
+from colour.io.luts import AbstractLUTSequenceOperator
 
 EXAMPLE_WRAPPER = """<?xml version="1.0" ?>
 <ProcessList id="Example Wrapper" compCLFversion="3.0">
@@ -66,10 +67,10 @@ def ocio_output_for_file(
     """Apply a color transform file to a flattened, one-dimensional list of
     R,G,B values.
     """
-    from PyOpenColorIO import FileTransform, GetCurrentConfig
+    import PyOpenColorIO as ocio
 
-    xform = FileTransform(src=path)
-    cpu = GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()
+    xform = ocio.FileTransform(src=path)
+    cpu = ocio.GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()
     result = cpu.applyRGB(rgb)
     # Note: depending on the input, `applyRGB` will either return the result data, or
     # modify the data in place. If the return value was `None` the data was modified
@@ -100,6 +101,28 @@ def result_as_array(result_text: str) -> NDArrayFloat:
     return np.array(result_values)
 
 
+class SimpleRange(AbstractLUTSequenceOperator):
+    def __init__(
+        self, in_range: tuple[float, float], out_range: tuple[float, float]
+    ) -> None:
+        self.in_range = in_range
+        self.out_range = out_range
+
+    def apply(self, x: NDArrayFloat) -> NDArrayFloat:
+        normalised = (x - self.in_range[0]) / (self.in_range[1] - self.in_range[0])
+        return normalised * (self.out_range[1] - self.out_range[0]) + self.out_range[0]
+
+
+class Normaliser(SimpleRange):
+    def __init__(self, source_range: tuple[float, float]) -> None:
+        super().__init__(source_range, (0.0, 1.0))
+
+
+class Denormaliser(SimpleRange):
+    def __init__(self, target_range: tuple[float, float]) -> None:
+        super().__init__((0.0, 1.0), target_range)
+
+
 def assert_ocio_consistency(
     value: NDArrayFloat, snippet: str, err_msg: str = "", decimals: int = 5
 ) -> None:
@@ -110,7 +133,9 @@ def assert_ocio_consistency(
     if process_list is None:
         err = "Invalid CLF snippet."
         raise AssertionError(err)
-    process_list_output = apply(process_list, value, normalised_values=True)
+    lut_sequence = CLFProcessList(process_list)
+    # apply_input_normalisation(process_list, lut_sequence)
+    process_list_output = lut_sequence.apply(value, normalised_values=True)
     value_tuple = value[0], value[1], value[2]
     ocio_output = ocio_output_for_snippet(snippet, value_tuple)
     # Note: OCIO only accepts 16-bit floats so the precision agreement is limited.
@@ -119,17 +144,19 @@ def assert_ocio_consistency(
     )
 
 
-def assert_ocio_consistency_for_file(value_rgb: NDArrayFloat, clf_path: str) -> None:
+def assert_ocio_consistency_for_file(value: NDArrayFloat, clf_path: str) -> None:
     """Assert that the colour library calculates the same output as the OCIO reference
     implementation for the given file.
     """
 
-    clf_data = clf.read_clf_from_file(clf_path)
-    if clf_data is None:
+    process_list = clf.read_clf_from_file(clf_path)
+    if process_list is None:
         err = "Invalid CLF snippet."
         raise AssertionError(err)
-    process_list_output = apply(clf_data, value_rgb, normalised_values=True)
-    ocio_output = ocio_output_for_file(clf_path, value_rgb)
+    lut_sequence = CLFProcessList(process_list)
+    # apply_input_normalisation(process_list, lut_sequence)
+    process_list_output = lut_sequence.apply(value, normalised_values=True)
+    ocio_output = ocio_output_for_file(clf_path, value)
     np.testing.assert_array_almost_equal(process_list_output, ocio_output)
 
 

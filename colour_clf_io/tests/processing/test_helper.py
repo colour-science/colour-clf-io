@@ -11,6 +11,7 @@ __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
 import numpy as np
+
 from colour_clf_io.processing import from_f16_to_uint16, from_uint16_to_f16
 
 

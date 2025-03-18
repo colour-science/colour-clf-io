@@ -2,13 +2,14 @@
 Define functionality to execute and run CLF workflows.
 """
 
-try:
-    import colour
-except ImportError:
-    raise ImportError(
+import importlib.util
+
+if importlib.util.find_spec("colour") is None:
+    err_msg = (
         "Optional dependency 'colour' not found. Please install the optional "
         "for `processing` before accessing the processing module."
     )
+    raise ImportError(err_msg)
 
 from abc import abstractmethod
 from collections.abc import Callable
@@ -32,7 +33,7 @@ from numpy.typing import ArrayLike, NDArray
 
 import colour_clf_io as clf
 
-__all__ = ["apply"]
+__all__ = ["CLFProcessList"]
 
 import numpy.typing as npt
 from colour.models.rgb.transfer_functions import (
@@ -833,48 +834,63 @@ def as_LUT_sequence_item(  # noqa: PLR0911
     raise RuntimeError(message)
 
 
-def apply(
-    process_list: clf.ProcessList,
-    value: NDArrayFloat,
-    normalised_values: bool = False,
-) -> NDArrayFloat:
+class CLFProcessList(LUTSequence):
     """
-    Apply the transformation described by the given :class:`colour_clf_io.ProcessList`
-    to the given value.
+    Defines a *LUT* sequence created from a `colour_clf_io.ProcessList`. Creates the
+    nodes needed to execute the transformation described in the *Process List*.
+    """
 
-    Parameters
-    ----------
-        process_list
-            The :class:`colour_clf_io.ProcessList` instance to apply.
-        value
-            Input value in the form of an array. Shape and data format need to be
-            compatible with the given `process_list`.
+    def __init__(
+        self,
+        process_list: clf.ProcessList,
+    ) -> None:
+        self.process_list = process_list
+        lut_sequence_items = map(as_LUT_sequence_item, process_list.process_nodes)
+        sequence = LUTSequence(*lut_sequence_items)
+        super().__init__(*sequence)
+
+    def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArrayFloat:
+        """
+        Apply the *LUT* sequence sequentially to given *RGB* colourspace
+        array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence sequentially
+            onto.
+
+        Other Parameters
+        ----------------
         normalised_values
-            Indicates whether the input values are normalised to the range 0..1. If
-            this is the case, the range will be expanded to the input range expected
-            by the given `process_list`.
+            Argument extracted from the kwargs. Used to indicate that the
+            values passed to the apply method are already normalised.
+        kwargs
+            Keywords arguments, the keys must be the class type names for which
+            they are intended to be used with. There is no implemented way to
+            discriminate which class instance the keyword arguments should be
+            used with, thus if many class instances of the same type are
+            members of the sequence, any matching keyword arguments will be
+            used with all the class instances.
 
-    Returns
-    -------
-    :class:`NDArrayFloat`
-        Result of applying the given :class:`colour_clf_io.ProcessList`.
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
 
-    Raises
-    ------
-    :class:`CLFExecutionError`
-        If the given *process_list* is invalid according to the CLF specification
-        (e.g., missing or invalid parameters).
-    """
-    if not normalised_values:
-        value = value / process_list.process_nodes[0].in_bit_depth.scale_factor()
+        """
+        RGB = as_float_array(RGB)
 
-    lut_sequence_items = [
-        as_LUT_sequence_item(node) for node in process_list.process_nodes
-    ]
-    sequence = LUTSequence(*lut_sequence_items)
-    result = sequence.apply(value)
+        normalised_values = kwargs.get("normalised_values", False)
+        if not normalised_values:
+            RGB = RGB / self.process_list.process_nodes[0].in_bit_depth.scale_factor()
 
-    if not normalised_values:
-        result = result * process_list.process_nodes[-1].out_bit_depth.scale_factor()
+        result = super().apply(RGB, **kwargs)
 
-    return result
+        if not normalised_values:
+            result = (
+                result
+                * self.process_list.process_nodes[-1].out_bit_depth.scale_factor()
+            )
+
+        return result

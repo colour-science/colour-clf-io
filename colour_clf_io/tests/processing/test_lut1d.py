@@ -13,8 +13,8 @@ __status__ = "Production"
 
 import numpy as np
 import pytest
-from colour_clf_io.processing import from_f16_to_uint16, from_uint16_to_f16
 
+from colour_clf_io.processing import from_f16_to_uint16, from_uint16_to_f16
 from colour_clf_io.tests.processing.test_common import (
     RESOURCES_ROOT,
     assert_ocio_consistency,
