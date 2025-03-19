@@ -69,7 +69,7 @@ dev-dependencies = [
     "invoke",
     "jupyter",
     "pre-commit",
-    "pyright",
+    "pyright==1.1.396",
     "pytest",
     "pytest-cov",
     "pytest-xdist",
