@@ -58,10 +58,44 @@ The main entry point of the library is the ``read_clf`` function in the main nam
 
     import colour_clf_io
 
-    example = """
-    <?xml version="1.0" ?>
-    <ProcessList xmlns="urn:AMPAS:CLF:v3.0" id="Example Wrapper" compCLFversion="2.0">
-        <LUT3D id="lut-24" name="green look" interpolation="trilinear" inBitDepth="12i" outBitDepth="16f">
+    example = """<?xml version="1.0" ?>
+        <ProcessList xmlns="urn:AMPAS:CLF:v3.0" id="Example Wrapper" compCLFversion="2.0">
+            <LUT3D id="lut-24" name="green look" interpolation="trilinear" inBitDepth="12i" outBitDepth="16f">
+                <Description>3D LUT</Description>
+                <Array dim="2 2 2 3">
+                    0.0 0.0 0.0
+                    0.0 0.0 1.0
+                    0.0 1.0 0.0
+                    0.0 1.0 1.0
+                    1.0 0.0 0.0
+                    1.0 0.0 1.0
+                    1.0 1.0 0.0
+                    1.0 1.0 1.0
+                </Array>
+                </LUT3D>
+        </ProcessList>
+    """  # noqa: E501
+    clf_doc = colour_clf_io.parse_clf(example)
+    print(clf_doc)
+
+.. code-block:: text
+
+    ProcessList(id='Example Wrapper', compatible_CLF_version='3.0', process_nodes=[LUT3D(id='lut-24', name='green look', in_bit_depth=<BitDepth.i12: '12i'>, out_bit_depth=<BitDepth.f16: '16f'>, description='3D LUT', array=Array(values=[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0], dim=(2, 2, 2, 3)), half_domain=False, raw_halfs=False, interpolation=<Interpolation3D.TRILINEAR: 'trilinear'>)], name=None, inverse_of=None, description=[], input_descriptor='', output_descriptor='', info=Info(app_release=None, copyright=None, revision=None, aces_transform_id=None, aces_user_name=None, calibration_info=None))
+
+and for writing a CLF file the ``write_clf`` function can be used to serialise a ``ProcessList`` back to XML
+
+
+.. code-block:: python
+
+    xml = colour_clf_io.write_clf(clf_doc)
+    print(xml)
+
+.. code-block:: text
+
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <ProcessList xmlns="urn:AMPAS:CLF:v3.0" compCLFversion="3.0" id="Example Wrapper">
+        <Info/>
+        <LUT3D id="lut-24" inBitDepth="12i" interpolation="trilinear" name="green look" outBitDepth="16f">
             <Description>3D LUT</Description>
             <Array dim="2 2 2 3">
                 0.0 0.0 0.0
@@ -73,15 +107,8 @@ The main entry point of the library is the ``read_clf`` function in the main nam
                 1.0 1.0 0.0
                 1.0 1.0 1.0
             </Array>
-            </LUT3D>
+        </LUT3D>
     </ProcessList>
-    """  # noqa: E501
-    clf_doc = colour_clf_io.read_clf(EXAMPLE_WRAPPER.format(example))
-    print(clf_doc)
-
-.. code-block:: text
-
-    ProcessList(id='Example Wrapper', compatible_CLF_version='3.0', process_nodes=[LUT3D(id='lut-24', name='green look', in_bit_depth=<BitDepth.i12: '12i'>, out_bit_depth=<BitDepth.f16: '16f'>, description='3D LUT', array=Array(values=[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0], dim=(2, 2, 2, 3)), half_domain=False, raw_halfs=False, interpolation=<Interpolation3D.TRILINEAR: 'trilinear'>)], name=None, inverse_of=None, description=[], input_descriptor='', output_descriptor='', info=Info(app_release=None, copyright=None, revision=None, aces_transform_id=None, aces_user_name=None, calibration_info=None))
 
 User Guide
 ----------

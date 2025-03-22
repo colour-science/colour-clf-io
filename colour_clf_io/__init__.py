@@ -104,7 +104,7 @@ __change_version__ = "1"
 __version__ = f"{__major_version__}.{__minor_version__}.{__change_version__}"
 
 
-def read_clf(path: str | Path) -> ProcessList | None:
+def read_clf_from_file(path: str | Path) -> ProcessList:
     """
     Read given *CLF* file and return a *ProcessList*.
 
@@ -127,10 +127,14 @@ def read_clf(path: str | Path) -> ProcessList | None:
     xml = lxml.etree.parse(str(path))  # noqa: S320
     xml_process_list = xml.getroot()
 
-    return ProcessList.from_xml(xml_process_list)
+    process_list = ProcessList.from_xml(xml_process_list)
+    if process_list is None:
+        err = "Process list could not be parsed."
+        raise ValueError(err)
+    return process_list
 
 
-def parse_clf(text: str | bytes) -> ProcessList | None:
+def read_clf(text: str | bytes) -> ProcessList | None:
     """
     Read given string as a *CLF* file and return a *ProcessList*.
 
@@ -153,3 +157,29 @@ def parse_clf(text: str | bytes) -> ProcessList | None:
     xml = lxml.etree.fromstring(text)  # noqa: S320
 
     return ProcessList.from_xml(xml)
+
+
+def write_clf(process_list: ProcessList, path: str | Path | None = None) -> None | str:
+    """
+    Write the given *ProcessList* as a CLF file to the target
+    location. If no *path* is given the CLF document will be returned as a string.
+
+    Parameters
+    ----------
+    process_list
+        *ProcessList* that should be written.
+    path
+        Location of the file, or *None* to return a string representation of the
+        CLF document.
+
+    Returns
+    -------
+    :class:`colour_clf_io.ProcessList`
+    """
+    xml = process_list.to_xml()
+    serialised = lxml.etree.tostring(xml)
+    if path is None:
+        return serialised.decode("utf-8")
+    with open(path, "wb") as f:
+        f.write(serialised)
+    return None

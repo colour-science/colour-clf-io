@@ -37,7 +37,7 @@ EXAMPLE_WRAPPER: str = """
 """.strip()
 
 
-def wrap_snippet(snippet: str) -> str:
+def wrap_snippet(snippet: str | bytes) -> str:
     """
     Take a string that should contain the text representation of a *CLF* node, and
     returns valid *CLF* file. Essentially the given string is pasted into the
@@ -80,7 +80,7 @@ def snippet_to_process_list(
 
     doc = wrap_snippet(snippet)
 
-    return colour_clf_io.parse_clf(doc)
+    return colour_clf_io.read_clf(doc)
 
 
 def snippet_as_tmp_file(snippet: str) -> str:
