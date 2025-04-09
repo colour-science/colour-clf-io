@@ -39,7 +39,7 @@ from colour.models.rgb.transfer_functions import (
     logarithmic_function_camera,
     logarithmic_function_quasilog,
 )
-from colour.utilities import as_float_array, tsplit, tstack
+from colour.utilities import as_float_array, optional, tsplit, tstack
 from numpy.typing import ArrayLike, NDArray
 
 import colour_clf_io as clf
@@ -578,32 +578,24 @@ def apply_log_internal(  # noqa: PLR0911
 
     style, in_bit_depth, out_bit_depth = extra_args
 
-    params = params if params is not None else clf.LogParams.default()
-    base = params.base if params.base is not None else clf.LogParams.default().base
+    params = optional(params, clf.LogParams.default())
+    base = optional(params.base, clf.LogParams.default().base)
     assert base is not None  # noqa: S101
     base = int(base)
-    log_side_slope = (
-        params.log_side_slope
-        if params.log_side_slope is not None
-        else clf.LogParams.default().log_side_slope
+    log_side_slope = optional(
+        params.log_side_slope, clf.LogParams.default().log_side_slope
     )
     assert log_side_slope is not None  # noqa: S101
-    lin_side_slope = (
-        params.lin_side_slope
-        if params.lin_side_slope is not None
-        else clf.LogParams.default().lin_side_slope
+    lin_side_slope = optional(
+        params.lin_side_slope, clf.LogParams.default().lin_side_slope
     )
     assert lin_side_slope is not None  # noqa: S101
-    log_side_offset = (
-        params.log_side_offset
-        if params.log_side_offset is not None
-        else clf.LogParams.default().log_side_offset
+    log_side_offset = optional(
+        params.log_side_offset, clf.LogParams.default().log_side_offset
     )
     assert log_side_offset is not None  # noqa: S101
-    lin_side_offset = (
-        params.lin_side_offset
-        if params.lin_side_offset is not None
-        else clf.LogParams.default().lin_side_offset
+    lin_side_offset = optional(
+        params.lin_side_offset, clf.LogParams.default().lin_side_offset
     )
     assert lin_side_offset is not None  # noqa: S101
     match style:
@@ -792,17 +784,9 @@ def apply_exponent_internal(  # noqa: PLR0911
     -------
         :class:`numpy.ndarray`
     """
-    exponent = (
-        params.exponent
-        if params.exponent is not None
-        else clf.ExponentParams.default().exponent
-    )
+    exponent = optional(params.exponent, clf.ExponentParams.default().exponent)
     assert exponent is not None  # noqa: S101
-    offset = (
-        params.offset
-        if params.offset is not None
-        else clf.ExponentParams.default().offset
-    )
+    offset = optional(params.offset, clf.ExponentParams.default().offset)
     assert offset is not None  # noqa: S101
     style = extra_args
     match style:
