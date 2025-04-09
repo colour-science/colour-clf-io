@@ -8,6 +8,8 @@ from collections.abc import Generator
 from typing import Any
 
 import numpy as np
+from colour.hints import NDArrayFloat
+from colour.io.luts import AbstractLUTSequenceOperator
 
 import colour_clf_io as clf
 from colour_clf_io.processing import CLFProcessList
@@ -17,9 +19,6 @@ __all__ = [
     "assert_ocio_consistency_for_file",
     "snippet_to_process_list",
 ]
-
-from colour.hints import NDArrayFloat
-from colour.io.luts import AbstractLUTSequenceOperator
 
 EXAMPLE_WRAPPER = """<?xml version="1.0" ?>
 <ProcessList id="Example Wrapper" compCLFversion="3.0">
