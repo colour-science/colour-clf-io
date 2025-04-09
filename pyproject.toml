@@ -76,8 +76,8 @@ dev-dependencies = [
     "toml",
     "twine",
     # Package Specific
-    "lxml-stubs>=0.5.1,<0.6",
-    "opencolorio>=2.4.1",
+    "lxml-stubs",
+    "opencolorio>=2,<3",
 ]
 
 [build-system]
