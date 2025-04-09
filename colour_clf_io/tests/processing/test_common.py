@@ -30,22 +30,22 @@ RESOURCES_ROOT: str = os.path.join(os.path.dirname(__file__), "resources")
 
 
 def wrap_snippet(snippet: str) -> str:
-    """# noqa: D401
+    """
     Takes a string that should contain the text representation of a CLF node, and
     returns valid CLF document. Essentially the given string is pasted into the
     `ProcessList` if a CLF document.
 
     This is useful to quickly convert example snippets of Process Nodes into valid CLF
     documents for parsing.
-    """
+    """  # noqa: D401
     return EXAMPLE_WRAPPER.format(snippet)
 
 
 def snippet_to_process_list(snippet: str) -> clf.ProcessList | None:
-    """# noqa: D401
+    """
     Takes a string that should contain a valid body for a XML Process List and
     returns the parsed `ProcessList`.
-    """
+    """  # noqa: D401
     doc = wrap_snippet(snippet)
     return clf.read_clf(doc)
 
