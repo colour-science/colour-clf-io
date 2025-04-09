@@ -19,6 +19,7 @@ from collections.abc import Callable
 from typing import cast
 
 import numpy as np
+import numpy.typing as npt
 from colour.algebra import (
     table_interpolation_tetrahedral,
     table_interpolation_trilinear,
@@ -31,14 +32,6 @@ from colour.hints import (
 from colour.io import luts
 from colour.io.luts.operator import AbstractLUTSequenceOperator
 from colour.io.luts.sequence import LUTSequence
-from colour.utilities import as_float_array, tsplit, tstack
-from numpy.typing import ArrayLike, NDArray
-
-import colour_clf_io as clf
-
-__all__ = ["CLFProcessList"]
-
-import numpy.typing as npt
 from colour.models.rgb.transfer_functions import (
     exponent_function_basic,
     exponent_function_monitor_curve,
@@ -46,9 +39,14 @@ from colour.models.rgb.transfer_functions import (
     logarithmic_function_camera,
     logarithmic_function_quasilog,
 )
+from colour.utilities import as_float_array, tsplit, tstack
+from numpy.typing import ArrayLike, NDArray
 
+import colour_clf_io as clf
 from colour_clf_io import ExponentStyle
 from colour_clf_io.values import Channel
+
+__all__ = ["CLFProcessList"]
 
 
 class CLFExecutionError(Exception):
