@@ -1033,6 +1033,10 @@ class CLFProcessList(LUTSequence):
     """
     Defines a *LUT* sequence created from a `colour_clf_io.ProcessList`. Creates the
     nodes needed to execute the transformation described in the *Process List*.
+
+    Methods
+    -------
+    -   :meth:`~colour_clf_io.CLFProcessList.apply`
     """
 
     def __init__(
