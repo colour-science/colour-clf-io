@@ -201,7 +201,7 @@ class CLFNode(AbstractLUTSequenceOperator):
 
         Returns
         -------
-        :class:`colour_clf_io.ProcessNode`
+        :class:`colour_clf_io.processing.ProcessNode`
             Process node.
         """
 
@@ -262,9 +262,36 @@ class LUT3D(CLFNode):
 
     @property
     def node(self) -> clf.LUT3D:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.LUT3D`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
+        """
+        Apply the *LUT* sequence operator to given *RGB* colourspace array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence operator onto.
+
+        Other Parameters
+        ----------------
+        args
+            Arguments.
+        kwargs
+            Keywords arguments.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
+        """
         RGB = self._from_input_range(RGB)
         node = self.node
         table = node.array.as_array()
@@ -315,11 +342,11 @@ class LUT1D(CLFNode):
 
     Attributes
     ----------
-    -   :attr:`~colour.io.luts.clf.CLFNode.node`
+    -   :attr:`~colour_clf_io.LUT1D.node`
 
     Methods
     -------
-    -   :meth:`~colour.io.luts.LUT1D.apply`
+    -   :meth:`~colour_clf_io.LUT1D.apply`
     """
 
     def __init__(self, node: clf.LUT1D) -> None:
@@ -328,9 +355,36 @@ class LUT1D(CLFNode):
 
     @property
     def node(self) -> clf.LUT1D:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.LUT1D`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
+        """
+        Apply the *LUT* sequence operator to given *RGB* colourspace array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence operator onto.
+
+        Other Parameters
+        ----------------
+        args
+            Arguments.
+        kwargs
+            Keywords arguments.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
+        """
         RGB = self._from_input_range(RGB)
         table = self.node.array.as_array()
         if len(table.shape) > 1:
@@ -361,7 +415,7 @@ class Matrix(CLFNode):
 
     Methods
     -------
-    -   :meth:`~colour.io.luts.Matrix.apply`
+    -   :meth:`~colour_clf_io.Matrix.apply`
     """
 
     def __init__(self, node: clf.Matrix) -> None:
@@ -370,6 +424,13 @@ class Matrix(CLFNode):
 
     @property
     def node(self) -> clf.Matrix:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.Matrix`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
@@ -411,7 +472,7 @@ class Range(CLFNode):
 
     Methods
     -------
-    -   :meth:`~colour.io.luts.Range.apply`
+    -   :meth:`~colour_clf_io.Range.apply`
     """
 
     def __init__(self, node: clf.Range) -> None:
@@ -420,9 +481,36 @@ class Range(CLFNode):
 
     @property
     def node(self) -> clf.Range:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.Range`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
+        """
+        Apply the *LUT* sequence operator to given *RGB* colourspace array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence operator onto.
+
+        Other Parameters
+        ----------------
+        args
+            Arguments.
+        kwargs
+            Keywords arguments.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
+        """
         node = self.node
         RGB = self._from_input_range(RGB)
         value = RGB * self.node.in_bit_depth.scale_factor()
@@ -468,6 +556,26 @@ FLT_MIN = 1.175494e-38
 def apply_log_internal(  # noqa: PLR0911
     value: NDArrayFloat, params: clf.LogParams, extra_args: Any
 ) -> NDArrayFloat:
+    """
+    Apply the log transform to the given array. This array should contain a single
+    colour channel, and the other arguments the settings for that channel.
+
+    This function is meant to be used as input for `apply_by_channel`.
+
+    Parameters
+    ----------
+    value
+        Single channel array to apply the log transform to.
+    params
+        Parameters to be used for the log transform.
+    extra_args
+        Extra arguments to be passed to the log transform.
+
+    Returns
+    -------
+        :class:`numpy.ndarray`
+    """
+
     style, in_bit_depth, out_bit_depth = extra_args
 
     params = params if params is not None else clf.LogParams.default()
@@ -593,7 +701,7 @@ class Log(CLFNode):
 
     Methods
     -------
-    -   :meth:`~colour.io.luts.Log.apply`
+    -   :meth:`~colour_clf_io.Log.apply`
     """
 
     def __init__(self, node: clf.Log) -> None:
@@ -602,9 +710,36 @@ class Log(CLFNode):
 
     @property
     def node(self) -> clf.Log:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.Log`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
+        """
+        Apply the *LUT* sequence operator to given *RGB* colourspace array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence operator onto.
+
+        Other Parameters
+        ----------------
+        args
+            Arguments.
+        kwargs
+            Keywords arguments.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
+        """
         RGB = self._from_input_range(RGB)
         node = self.node
         style = node.style
@@ -638,6 +773,25 @@ def mon_curve_reverse(x: NDArrayFloat, exponent: float, offset: float) -> NDArra
 def apply_exponent_internal(  # noqa: PLR0911
     value: NDArrayFloat, params: clf.ExponentParams, extra_args: Any
 ) -> NDArrayFloat:
+    """
+    Apply the exponent transform to the given array. This array should contain a single
+    colour channel, and the other arguments the settings for that channel.
+
+    This function is meant to be used as input for `apply_by_channel`.
+
+    Parameters
+    ----------
+    value
+        Single channel array to apply the log transform to.
+    params
+        Parameters to be used for the log transform.
+    extra_args
+        Extra arguments to be passed to the log transform.
+
+    Returns
+    -------
+        :class:`numpy.ndarray`
+    """
     exponent = (
         params.exponent
         if params.exponent is not None
@@ -700,7 +854,7 @@ class Exponent(CLFNode):
 
     Methods
     -------
-    -   :meth:`~colour.io.luts.Exponent.apply`
+    -   :meth:`~colour_clf_io.Exponent.apply`
     """
 
     def __init__(self, node: clf.Exponent) -> None:
@@ -709,9 +863,36 @@ class Exponent(CLFNode):
 
     @property
     def node(self) -> clf.Exponent:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.Exponent`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
+        """
+        Apply the *LUT* sequence operator to given *RGB* colourspace array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence operator onto.
+
+        Other Parameters
+        ----------------
+        args
+            Arguments.
+        kwargs
+            Keywords arguments.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
+        """
         node = self.node
         RGB = self._from_input_range(RGB)
         style = node.style
@@ -740,7 +921,7 @@ class ASC_CDL(CLFNode):
 
     Methods
     -------
-    -   :meth:`~colour.io.luts.ASC_CDL.apply`
+    -   :meth:`~colour_clf_io.ASC_CDL.apply`
     """
 
     def __init__(self, node: clf.ASC_CDL) -> None:
@@ -749,9 +930,36 @@ class ASC_CDL(CLFNode):
 
     @property
     def node(self) -> clf.ASC_CDL:
+        """
+        Returns the CLF specification of this process node.
+
+        Returns
+        -------
+            :class:`colour_clf_io.ASC_CDL`
+        """
         return self._node
 
     def apply(self, RGB: ArrayLike, **kwargs: Any) -> NDArray:  # noqa: ARG002
+        """
+        Apply the *LUT* sequence operator to given *RGB* colourspace array.
+
+        Parameters
+        ----------
+        RGB
+            *RGB* colourspace array to apply the *LUT* sequence operator onto.
+
+        Other Parameters
+        ----------------
+        args
+            Arguments.
+        kwargs
+            Keywords arguments.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            Processed *RGB* colourspace array.
+        """
         node = self.node
         RGB = self._from_input_range(RGB)
         sop = node.sopnode
