@@ -1,7 +1,4 @@
-# !/usr/bin/env python
 """Define the unit tests for the :mod:`colour.io.clf` module."""
-
-import unittest
 
 __author__ = "Colour Developers"
 __copyright__ = "Copyright 2013 Colour Developers"
@@ -50,7 +47,3 @@ class TestHelpers:
             float_value = from_uint16_to_f16(value)
             int_value = from_f16_to_uint16(float_value)
             np.testing.assert_almost_equal(value, int_value)
-
-
-if __name__ == "__main__":
-    unittest.main()

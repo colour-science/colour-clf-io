@@ -1,7 +1,4 @@
-# !/usr/bin/env python
 """Define the unit tests for the :mod:`colour.io.clf` module."""
-
-import unittest
 
 __author__ = "Colour Developers"
 __copyright__ = "Copyright 2013 Colour Developers"
@@ -87,7 +84,3 @@ class TestRange:
         for rgb in rgb_sample_iter():
             value_rgb = np.array(rgb)
             assert_ocio_consistency(value_rgb, example, f"Input value was {rgb}")
-
-
-if __name__ == "__main__":
-    unittest.main()

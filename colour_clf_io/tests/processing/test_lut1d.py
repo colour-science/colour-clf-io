@@ -1,8 +1,6 @@
-# !/usr/bin/env python
 """Define the unit tests for the :mod:`colour.io.clf` module."""
 
 import os
-import unittest
 
 __author__ = "Colour Developers"
 __copyright__ = "Copyright 2013 Colour Developers"
@@ -166,7 +164,3 @@ class TestLUT1D:
         value_rgb = np.array([1.0, 0.5, 0.0], dtype=np.float32)
         path = os.path.join(RESOURCES_ROOT, "lut1_with_half_domain_sample.xml")
         assert_ocio_consistency_for_file(value_rgb, path)
-
-
-if __name__ == "__main__":
-    unittest.main()
