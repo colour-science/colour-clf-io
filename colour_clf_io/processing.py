@@ -1008,20 +1008,23 @@ def as_LUT_sequence_item(  # noqa: PLR0911
         If there exists no corresponding LUT sequence item for the given CLF node.
 
     """
-    if isinstance(node, clf.LUT1D):
-        return LUT1D(node)
-    if isinstance(node, clf.LUT3D):
-        return LUT3D(node)
-    if isinstance(node, clf.Matrix):
-        return Matrix(node)
-    if isinstance(node, clf.Range):
-        return Range(node)
-    if isinstance(node, clf.Log):
-        return Log(node)
-    if isinstance(node, clf.Exponent):
-        return Exponent(node)
-    if isinstance(node, clf.ASC_CDL):
-        return ASC_CDL(node)
+
+    match node:
+        case clf.LUT1D():
+            return LUT1D(node)
+        case clf.LUT3D():
+            return LUT3D(node)
+        case clf.Matrix():
+            return Matrix(node)
+        case clf.Range():
+            return Range(node)
+        case clf.Log():
+            return Log(node)
+        case clf.Exponent():
+            return Exponent(node)
+        case clf.ASC_CDL():
+            return ASC_CDL(node)
+
     message = f"No matching process node found for {node}."
     raise RuntimeError(message)
 
