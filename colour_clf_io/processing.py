@@ -70,8 +70,7 @@ def from_uint16_to_f16(array: npt.NDArray[np.uint16]) -> npt.NDArray[np.float16]
     -------
         :class:`npt.NDArray[np.float16]`
     """
-    values = list(map(int, array))
-    array = np.array(values, dtype=np.uint16)
+    array = np.array(array, dtype=np.uint16)
     array.dtype = np.float16  # type: ignore
     return array  # type: ignore
 
