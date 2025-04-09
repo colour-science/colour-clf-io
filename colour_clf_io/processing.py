@@ -1,4 +1,7 @@
 """
+Processing
+==========
+
 Define functionality to execute and run CLF workflows.
 """
 
@@ -219,7 +222,7 @@ class CLFNode(AbstractLUTSequenceOperator):
             :class:`NDArrayFloat`
 
         """
-        return cast(NDArrayFloat, value)
+        return cast("NDArrayFloat", value)
 
     def _to_output_range(self, value: NDArrayFloat) -> NDArrayFloat:
         """
@@ -385,7 +388,7 @@ def assert_range_correct(
     Assert the input and output ranges are consistent.
     """
     if None not in in_out:
-        in_out = cast(tuple[float, float], in_out)
+        in_out = cast("tuple[float, float]", in_out)
         expected_out_value = in_out[0] * bit_depth_scale
         if in_out[1] != expected_out_value:
             message = (
