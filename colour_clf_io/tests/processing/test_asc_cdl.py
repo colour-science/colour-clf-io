@@ -1,7 +1,4 @@
-# !/usr/bin/env python
 """Define the unit tests for the :mod:`colour.io.clf` module."""
-
-import unittest
 
 __author__ = "Colour Developers"
 __copyright__ = "Copyright 2013 Colour Developers"
@@ -121,7 +118,3 @@ class TestASC_CDL:
         </ASC_CDL>
         """
         assert_snippet_consistency(example)
-
-
-if __name__ == "__main__":
-    unittest.main()
