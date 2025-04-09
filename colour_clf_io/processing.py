@@ -948,9 +948,9 @@ class ASC_CDL(CLFNode):
         RGB = self._from_input_range(RGB)
         sop = node.sopnode
         if sop is None:
-            slope = np.array([1.0, 1.0, 1.0])
-            offset = np.array([0.0, 0.0, 0.0])
-            power = np.array([1.0, 1.0, 1.0])
+            slope = np.ones(3)
+            offset = np.zeros(3)
+            power = np.ones(3)
         else:
             slope = np.array(sop.slope)
             offset = np.array(sop.offset)
