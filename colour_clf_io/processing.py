@@ -187,7 +187,7 @@ class CLFNode(AbstractLUTSequenceOperator):
 
     Attributes
     ----------
-    -   :attr:`~colour.io.luts.clf.CLFNode.node`
+    -   :attr:`~colour_clf_io.processing.CLFNode.node`
     """
 
     def __init__(self, node: clf.ProcessNode) -> None:
