@@ -746,22 +746,6 @@ class Log(CLFNode):
         return self._to_output_range(out)
 
 
-def mon_curve_forward(x: NDArrayFloat, exponent: float, offset: float) -> NDArrayFloat:
-    x_break = offset / (exponent - 1)
-    s = ((exponent - 1) / offset) * (
-        (offset * exponent) / ((exponent - 1) * (1 + offset))
-    ) ** exponent
-    return np.where(x >= x_break, ((x + offset) / (1 + offset)) ** exponent, x * s)
-
-
-def mon_curve_reverse(x: NDArrayFloat, exponent: float, offset: float) -> NDArrayFloat:
-    y_break = ((offset * exponent) / ((exponent - 1) * (1 + offset))) ** exponent
-    s = ((exponent - 1) / offset) * (
-        (offset * exponent) / ((exponent - 1) * (1 + offset))
-    ) ** exponent
-    return np.where(x >= y_break, (1 + offset) * x ** (1 / exponent) - offset, x / s)
-
-
 def apply_exponent_internal(  # noqa: PLR0911
     value: NDArrayFloat, params: clf.ExponentParams, extra_args: Any
 ) -> NDArrayFloat:
