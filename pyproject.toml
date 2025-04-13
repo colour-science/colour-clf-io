@@ -49,6 +49,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+processing = [
+    "colour-science>=0.4.6",
+]
 docs = [
     "biblib-simple",
     "pydata-sphinx-theme",
@@ -73,7 +76,8 @@ dev-dependencies = [
     "toml",
     "twine",
     # Package Specific
-    "lxml-stubs>=0.5.1,<0.6"
+    "lxml-stubs",
+    "opencolorio>=2,<3",
 ]
 
 [build-system]
@@ -156,7 +160,6 @@ convention = "numpy"
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["D104"]
-"colour_hdri/examples/*" = ["INP", "T201", "T203"]
 "docs/*" = ["INP"]
 "tasks.py" = ["INP"]
 "test_*" = ["S101"]

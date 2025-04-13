@@ -103,6 +103,13 @@ __minor_version__ = "1"
 __change_version__ = "1"
 __version__ = f"{__major_version__}.{__minor_version__}.{__change_version__}"
 
+try:
+    from colour_clf_io.processing import CLFProcessList
+
+    __all__ += ["CLFProcessList"]
+except ImportError:
+    pass
+
 
 def read_clf_from_file(path: str | Path) -> ProcessList:
     """
