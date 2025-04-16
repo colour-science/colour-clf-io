@@ -690,8 +690,8 @@ class TestParseCLF:
         import PyOpenColorIO as ocio
 
         ocio_transform = (
-            ocio.Config()
-            .getProcessor(ocio.BuiltinTransform("ARRI_LOGC4_to_ACES2065-1"))
+            ocio.Config()  # pyright: ignore[reportAttributeAccessIssue]
+            .getProcessor(ocio.BuiltinTransform("ARRI_LOGC4_to_ACES2065-1"))  # pyright: ignore[reportAttributeAccessIssue]
             .createGroupTransform()
         )
         clf_text = ocio_transform.write("Academy/ASC Common LUT Format").encode()

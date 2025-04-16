@@ -68,8 +68,8 @@ def ocio_output_for_file(
     """
     import PyOpenColorIO as ocio
 
-    xform = ocio.FileTransform(src=path)
-    cpu = ocio.GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()
+    xform = ocio.FileTransform(src=path)  # pyright: ignore[reportAttributeAccessIssue]
+    cpu = ocio.GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()  # pyright: ignore[reportAttributeAccessIssue]
     result = cpu.applyRGB(rgb)
     # Note: depending on the input, `applyRGB` will either return the result data, or
     # modify the data in place. If the return value was `None` the data was modified
