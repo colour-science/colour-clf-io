@@ -38,21 +38,15 @@ Features
 The following features are available:
 
 - Reading *CLF* files to a Python representation.
-
-The following features are planned and in development:
-
 - Writing *CLF* files from the Python representation.
-- Validating *CLF* files according to the specification.
+- Executing *CLF* workflows and applying them to colours or images.
 
-Features that will not be part of this library:
-
-- Executing *CLF* workflows and applying them to colours or images. This feature will be implemented as part of `Colour
-  <https://github.com/colour-science/colour/>`__.
 
 Examples
 ^^^^^^^^
 
-The main entry point of the library is the ``read_clf`` function in the main namespace.
+The main entry point of the library is the ``read_clf`` function in the main namespace, which allows one to parse
+a CLF document:
 
 .. code-block:: python
 
@@ -75,14 +69,14 @@ The main entry point of the library is the ``read_clf`` function in the main nam
                 </LUT3D>
         </ProcessList>
     """  # noqa: E501
-    clf_doc = colour_clf_io.parse_clf(example)
+    clf_doc = colour_clf_io.read_clf(example)
     print(clf_doc)
 
 .. code-block:: text
 
     ProcessList(id='Example Wrapper', compatible_CLF_version='3.0', process_nodes=[LUT3D(id='lut-24', name='green look', in_bit_depth=<BitDepth.i12: '12i'>, out_bit_depth=<BitDepth.f16: '16f'>, description='3D LUT', array=Array(values=[0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0], dim=(2, 2, 2, 3)), half_domain=False, raw_halfs=False, interpolation=<Interpolation3D.TRILINEAR: 'trilinear'>)], name=None, inverse_of=None, description=[], input_descriptor='', output_descriptor='', info=Info(app_release=None, copyright=None, revision=None, aces_transform_id=None, aces_user_name=None, calibration_info=None))
 
-and for writing a CLF file the ``write_clf`` function can be used to serialise a ``ProcessList`` back to XML
+For writing a CLF file the ``write_clf`` function can be used to serialise a ``ProcessList`` back to XML:
 
 
 .. code-block:: python
@@ -110,6 +104,19 @@ and for writing a CLF file the ``write_clf`` function can be used to serialise a
         </LUT3D>
     </ProcessList>
 
+To execute a CLF workflow, you can create a *CLFProcessList* that can be applied to some input.
+
+.. code-block:: python
+
+    lut = colour_clf_io.CLFProcessList(clf_doc)
+    input_value = [0, 32768, 65535]
+    result = lut.apply(input_value)
+    print(result)
+
+.. code-block:: text
+
+    [ 0.  1.  1.]
+
 User Guide
 ----------
 
@@ -125,6 +132,10 @@ Primary Dependencies
 - `lxml >= 5.2.1 < 6 <https://pypi.org/project/lxml/>`__
 - `numpy >= 1.24, < 2 <https://pypi.org/project/numpy>`__
 
+If you want to execute CLF workflows, you will also need
+
+- `colour-science >= 0.4.6 <https://pypi.org/project/colour-science>`__
+
 Pypi
 ~~~~
 
@@ -137,6 +148,17 @@ issuing this command in a shell::
 The overall development dependencies are installed as follows::
 
     pip install --user 'colour-clf-io[development]'
+
+UV
+~~~~
+
+Using uv you can simply install **Colour - CLF IO** via::
+
+    uv add colour-clf-io
+
+or, if you want to execute CLF workflows::
+
+    uv add colour-clf-io --optional processing
 
 
 Contributing
