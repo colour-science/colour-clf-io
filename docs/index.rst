@@ -15,16 +15,8 @@ Features
 The following features are available:
 
 - Reading *CLF* files to a Python representation.
-
-The following features are planned and in development:
-
 - Writing *CLF* files from the Python representation.
-- Validating *CLF* files according to the specification.
-
-Features that will not be part of this library:
-
-- Executing *CLF* workflows and applying them to colours or images. This feature will be implemented as part of `Colour
-  <https://github.com/colour-science/colour/>`__.
+- Executing *CLF* workflows and applying them to colours or images.
 
 Examples
 ^^^^^^^^

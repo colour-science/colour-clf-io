@@ -1,14 +1,16 @@
 """
-CLF Parsing
-===========
+Colour - CLF IO
+===============
 
 Defines the functionality and data structures to parse *CLF* files.
 
 The main functionality is exposed through the following two methods:
--   :func:`colour.io.clf.read_clf`: Read a file in the *CLF* format and return the
-    corresponding :class: ProcessList.
--   :func:`colour.io.clf.parse_clf`: Read a string that contains a *CLF* file and
+-   :func:`colour.io.clf.read_clf_from_file`: Read a file in the *CLF* format and
     return the corresponding :class: ProcessList.
+-   :func:`colour.io.clf.read_clf`: Read a string that contains a *CLF* file and
+    return the corresponding :class: ProcessList.
+-   :func:`colour.io.clf.write_clf`: Take a :class: ProcessList and output the
+    corresponding CLF document.
 
 References
 ----------
@@ -131,7 +133,7 @@ def read_clf_from_file(path: str | Path) -> ProcessList:
         If the given file does not contain a valid *CLF* file.
     """
 
-    xml = lxml.etree.parse(str(path))  # noqa: S320
+    xml = lxml.etree.parse(str(path))
     xml_process_list = xml.getroot()
 
     process_list = ProcessList.from_xml(xml_process_list)
@@ -161,7 +163,7 @@ def read_clf(text: str | bytes) -> ProcessList | None:
         If the given string does not contain a valid *CLF* file.
     """
 
-    xml = lxml.etree.fromstring(text)  # noqa: S320
+    xml = lxml.etree.fromstring(text)
 
     return ProcessList.from_xml(xml)
 
