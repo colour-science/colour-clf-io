@@ -152,6 +152,7 @@ ignore = [
     "RUF022", # [*] `__all__` is not sorted
     "TRY003", # Avoid specifying long messages outside the exception class
     "UP038", #  Use `X | Y` in `isinstance` call instead of `(X, Y)`
+    "S320", # Lint is deprecated and will be removed from future ruff versions.
 ]
 typing-modules = []
 
