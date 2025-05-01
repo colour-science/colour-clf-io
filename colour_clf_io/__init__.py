@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import typing
 
+from .parsing import Namespaces
+
 if typing.TYPE_CHECKING:
     from pathlib import Path
 
@@ -168,7 +170,11 @@ def read_clf(text: str | bytes) -> ProcessList | None:
     return ProcessList.from_xml(xml)
 
 
-def write_clf(process_list: ProcessList, path: str | Path | None = None) -> None | str:
+def write_clf(
+    process_list: ProcessList,
+    path: str | Path | None = None,
+    namespace: Namespaces = Namespaces.AMPAS,
+) -> None | str:
     """
     Write the given *ProcessList* as a CLF file to the target
     location. If no *path* is given the CLF document will be returned as a string.
@@ -180,12 +186,15 @@ def write_clf(process_list: ProcessList, path: str | Path | None = None) -> None
     path
         Location of the file, or *None* to return a string representation of the
         CLF document.
+    namespace
+        :class:`colour_clf_io.Namespaces` instance to be used for the namespace
+        of the document.
 
     Returns
     -------
     :class:`colour_clf_io.ProcessList`
     """
-    xml = process_list.to_xml()
+    xml = process_list.to_xml(namespace)
     serialised = lxml.etree.tostring(xml)
     if path is None:
         return serialised.decode("utf-8")

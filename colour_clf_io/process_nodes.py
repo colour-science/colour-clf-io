@@ -854,8 +854,8 @@ class ASC_CDL(ProcessNode):
         xml = lxml.etree.Element("ASC_CDL")
         self.write_process_node_attributes(xml)
         xml.set("style", self.style.value)
-        if self.sat_node is not None:
-            xml.append(self.sat_node.to_xml())
         if self.sopnode is not None:
             xml.append(self.sopnode.to_xml())
+        if self.sat_node is not None:
+            xml.append(self.sat_node.to_xml())
         return xml
