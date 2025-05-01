@@ -11,6 +11,7 @@ import collections
 import typing
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum
 from itertools import islice
 from typing import TypeGuard, TypeVar
 
@@ -30,7 +31,7 @@ __email__ = "colour-developers@colour-science.org"
 __status__ = "Production"
 
 __all__ = [
-    "NAMESPACE_NAME",
+    "Namespaces",
     "ParserConfig",
     "XMLParsable",
     "XMLWritable",
@@ -46,9 +47,22 @@ __all__ = [
     "elements_as_text_list",
     "sliding_window",
     "three_floats",
+    "detect_namespace",
 ]
 
-NAMESPACE_NAME: str = "urn:AMPAS:CLF:v3.0"
+
+class Namespaces(Enum):
+    """
+    Valid namespaces for parsing and serialising CLF documents.
+    """
+
+    AMPAS = "urn:AMPAS:CLF:v3.0"
+    SMTP = "http://www.smpte-ra.org/ns/2136-1/2024"
+
+
+@dataclass
+class UnknownNamespace:
+    namespace: str
 
 
 @dataclass
@@ -58,17 +72,17 @@ class ParserConfig:
 
     Attributes
     ----------
-    -   :attr:`~colour_clf_io.ParserConfig.namespace_name`
+    -   :attr:`~colour_clf_io.ParserConfig.name_space`
 
     Methods
     -------
     -   :meth:`~colour_clf_io.ParserConfig.clf_namespace_prefix_mapping`
     """
 
-    namespace_name: str | None = NAMESPACE_NAME
+    namespace: Namespaces | None
     """
-    The namespace name used for parsing the *CLF* file. Usually this should
-    be the `CLF_NAMESPACE`, but it can be omitted."""
+    The namespace name used for parsing the *CLF* file.
+    """
 
     def clf_namespace_prefix_mapping(self) -> dict[str, str] | None:
         """
@@ -80,8 +94,8 @@ class ParserConfig:
             Dictionary that contain the namespaces prefix mappings.
         """
 
-        if self.namespace_name:
-            return {"clf": self.namespace_name}
+        if self.namespace:
+            return {"clf": self.namespace.value}
 
         return None
 
@@ -524,3 +538,30 @@ def set_element_if_not_none(node: lxml.etree._Element, name: str, value: Any) ->
     if value is not None and value != "":
         child = lxml.etree.SubElement(node, name)
         child.text = str(value)
+
+
+def detect_namespace(node: lxml.etree._Element) -> Namespaces | UnknownNamespace | None:
+    """
+    Detect the namespace of the given CLF document.
+
+    Parameters
+    ----------
+    node
+        XML element to check for namespace.
+
+    Returns
+    -------
+    :class:`NameSpace` or :class:`UnknownNamespace` or None depending on whether a valid
+    namespace was detected, an invalid namespace was detected, or no namespace is
+    present.
+    """
+    document_namespace = node.xpath("namespace-uri(.)")
+    if not document_namespace:
+        return None
+    document_namespace = str(document_namespace)
+    match document_namespace:
+        case Namespaces.SMTP.value:
+            return Namespaces.SMTP
+        case Namespaces.AMPAS.value:
+            return Namespaces.AMPAS
+    return UnknownNamespace(document_namespace)
