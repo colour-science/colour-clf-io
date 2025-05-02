@@ -12,7 +12,8 @@ Reading and Writing CLF Files
     :toctree: generated/
 
     read_clf
-    parse_clf
+    read_clf
+    write_clf
 
 Process List & Process Nodes
 ----------------------------

@@ -15,10 +15,15 @@ from _warnings import warn
 from colour_clf_io.elements import Info
 from colour_clf_io.errors import ParsingError
 from colour_clf_io.parsing import (
+    Namespaces,
     ParserConfig,
+    UnknownNamespace,
     check_none,
+    detect_namespace,
     element_as_text,
     elements_as_text_list,
+    set_attr_if_not_none,
+    set_element_if_not_none,
 )
 from colour_clf_io.process_nodes import (
     ProcessNode,
@@ -63,10 +68,10 @@ class ProcessList:
     -   https://docs.acescentral.com/specifications/clf/#processList
     """
 
-    id: str
+    id: str | None
     """A string to serve as a unique identifier of the *ProcessList*."""
 
-    compatible_CLF_version: str
+    compatible_CLF_version: str | None
     """
     A string indicating the minimum compatible CLF specification version
     required to read this file. The compCLFversion corresponding to this
@@ -120,10 +125,10 @@ class ProcessList:
     def from_xml(xml: lxml.etree._Element | None) -> ProcessList | None:
         """
         Parse and return a :class:`colour_clf_io.ProcessList` class instance
-        from the given XML element. Returns `None`` if the given XML element is
+        from the given XML element. Returns ``None`` if the given XML element is
         ``None``.
 
-        Expects the XML element to be a valid element according to the *CLF*
+        Expects the XML element to be a valid element, according to the *CLF*
         specification.
 
         Parameters
@@ -147,6 +152,27 @@ class ProcessList:
         if xml is None:
             return None
 
+        detected_namespace = detect_namespace(xml)
+        document_namespace: Namespaces | None = None
+        match detected_namespace:
+            case None:
+                document_namespace = None
+            case UnknownNamespace(value):
+                exception = f"Found invalid xmlns attribute in *ProcessList*: {value}"
+                raise ParsingError(exception)
+            case Namespaces():
+                document_namespace = detected_namespace
+
+        if document_namespace == Namespaces.SMTP:
+            error = (
+                "SMPTE ST 2136-1 files are not fully supported. See "
+                "https://github.com/colour-science/colour-clf-io/issues/6 "
+                "for more information. "
+            )
+            raise ParsingError(error)
+
+        config = ParserConfig(namespace=document_namespace)
+
         id_ = xml.get("id")
         check_none(id_, "ProcessList must contain an `id` attribute")
 
@@ -155,18 +181,6 @@ class ProcessList:
             compatible_clf_version,
             'ProcessList must contain a "compCLFversion" attribute',
         )
-
-        # By default, we would expect the correct namespace as per the specification.
-        # But if it is not present, we will still try to parse the document anyway.
-        # We won't accept a wrong namespace through.
-        config = ParserConfig()
-        namespace = xml.xpath("namespace-uri(.)")
-        if not namespace:
-            config.namespace_name = None
-        elif namespace != config.namespace_name:
-            exception = f"Found invalid xmlns attribute in *ProcessList*: {namespace}"
-
-            raise ParsingError(exception)
 
         name = xml.get("name")
         inverse_of = xml.get("inverseOf")
@@ -190,8 +204,8 @@ class ProcessList:
         assert_bit_depth_compatibility(process_nodes)
 
         return ProcessList(
-            id=id_,  # pyright: ignore
-            compatible_CLF_version=compatible_clf_version,  # pyright: ignore
+            id=id_,
+            compatible_CLF_version=compatible_clf_version,
             process_nodes=process_nodes,
             name=name,
             inverse_of=inverse_of,
@@ -200,3 +214,39 @@ class ProcessList:
             info=info,
             description=description,
         )
+
+    def to_xml(self, name_space: Namespaces = Namespaces.AMPAS) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Parameters
+        ----------
+        name_space
+            :class:`colour_clf_io.Namespaces` instance to be used for the namespace
+            of the document.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("ProcessList")
+
+        xml.set("xmlns", name_space.value)
+
+        for description_text in self.description:
+            description_element = lxml.etree.SubElement(xml, "Description")
+            description_element.text = description_text
+
+        set_attr_if_not_none(xml, "id", self.id)
+        set_attr_if_not_none(xml, "compCLFversion", self.compatible_CLF_version)
+        set_attr_if_not_none(xml, "name", self.name)
+        set_attr_if_not_none(xml, "inverseOf", self.inverse_of)
+        set_element_if_not_none(xml, "InputDescriptor", self.input_descriptor)
+        set_element_if_not_none(xml, "OutputDescriptor", self.output_descriptor)
+
+        if self.info:
+            xml.append(self.info.to_xml())
+
+        for process_node in self.process_nodes:
+            xml.append(process_node.to_xml())
+        return xml

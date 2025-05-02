@@ -27,12 +27,15 @@ from colour_clf_io.errors import ParsingError, ValidationError
 from colour_clf_io.parsing import (
     ParserConfig,
     XMLParsable,
+    XMLWritable,
     child_element,
     child_elements,
     element_as_float,
     elements_as_text_list,
     map_optional,
     retrieve_attributes,
+    set_attr_if_not_none,
+    set_element_if_not_none,
     sliding_window,
 )
 from colour_clf_io.values import (
@@ -95,7 +98,7 @@ def register_process_node_xml_constructor(name: str) -> Callable:
 
 
 @dataclass
-class ProcessNode(XMLParsable, ABC):
+class ProcessNode(XMLParsable, XMLWritable, ABC):
     """
     Represent a *ProcessNode*, an operation to be applied to the image data.
 
@@ -172,6 +175,25 @@ class ProcessNode(XMLParsable, ABC):
             "description": description,
             **attributes,
         }
+
+    def write_process_node_attributes(self, node: lxml.etree._Element) -> None:
+        """
+        Add the data of the *ProcessNode* as attributes to the given XML node.
+
+        Parameters
+        ----------
+        node
+            Target node that will receive the new attributes.
+        """
+        set_attr_if_not_none(node, "id", self.id)
+        set_attr_if_not_none(node, "name", self.name)
+        set_attr_if_not_none(node, "inBitDepth", self.in_bit_depth.value)
+        set_attr_if_not_none(node, "outBitDepth", self.out_bit_depth.value)
+        if self.description is None:
+            return
+        for description_text in self.description:
+            description_element = lxml.etree.SubElement(node, "Description")
+            description_element.text = description_text
 
 
 def assert_bit_depth_compatibility(process_nodes: list[ProcessNode]) -> bool:
@@ -330,6 +352,25 @@ class LUT1D(ProcessNode):
             **super_args,
         )
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("LUT1D")
+        self.write_process_node_attributes(xml)
+        if self.half_domain:
+            xml.set("halfDomain", "true")
+        if self.raw_halfs:
+            xml.set("rawHalfs", "true")
+        if self.interpolation is not None:
+            xml.set("interpolation", self.interpolation.value)
+        xml.append(self.array.to_xml())
+        return xml
+
 
 @dataclass
 class LUT3D(ProcessNode):
@@ -399,6 +440,25 @@ class LUT3D(ProcessNode):
             **super_args,
         )
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("LUT3D")
+        self.write_process_node_attributes(xml)
+        if self.half_domain:
+            xml.set("halfDomain", "true")
+        if self.raw_halfs:
+            xml.set("rawHalfs", "true")
+        if self.interpolation is not None:
+            xml.set("interpolation", self.interpolation.value)
+        xml.append(self.array.to_xml())
+        return xml
+
 
 @dataclass
 class Matrix(ProcessNode):
@@ -452,10 +512,22 @@ class Matrix(ProcessNode):
 
         if array is None:
             exception = "Matrix processing node does not have an Array element."
-
             raise ParsingError(exception)
 
         return Matrix(array=array, **super_args)
+
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("Matrix")
+        self.write_process_node_attributes(xml)
+        xml.append(self.array.to_xml())
+        return xml
 
 
 @dataclass
@@ -531,6 +603,24 @@ class Range(ProcessNode):
             **super_args,
         )
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("Range")
+        self.write_process_node_attributes(xml)
+        set_element_if_not_none(xml, "minInValue", self.min_in_value)
+        set_element_if_not_none(xml, "maxInValue", self.max_in_value)
+        set_element_if_not_none(xml, "minOutValue", self.min_out_value)
+        set_element_if_not_none(xml, "maxOutValue", self.max_out_value)
+        if self.style is not None:
+            xml.set("style", self.style.value)
+        return xml
+
 
 @dataclass
 class Log(ProcessNode):
@@ -591,6 +681,21 @@ class Log(ProcessNode):
         ]
 
         return Log(style=style, log_params=params, **super_args)
+
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("Log")
+        self.write_process_node_attributes(xml)
+        xml.set("style", self.style.value)
+        for log_params in self.log_params:
+            xml.append(log_params.to_xml())
+        return xml
 
 
 @dataclass
@@ -666,6 +771,21 @@ class Exponent(ProcessNode):
 
         return Exponent(style=style, exponent_params=params, **super_args)
 
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("Exponent")
+        self.write_process_node_attributes(xml)
+        xml.set("style", self.style.value)
+        for exponent_params in self.exponent_params:
+            xml.append(exponent_params.to_xml())
+        return xml
+
 
 @dataclass
 class ASC_CDL(ProcessNode):
@@ -722,3 +842,20 @@ class ASC_CDL(ProcessNode):
         sat_node = SatNode.from_xml(child_element(xml, "SatNode", config), config)
 
         return ASC_CDL(style=style, sopnode=sop_node, sat_node=sat_node, **super_args)
+
+    def to_xml(self) -> lxml.etree._Element:
+        """
+        Serialise this object as an XML object.
+
+        Returns
+        -------
+        :class:`lxml.etree._Element`
+        """
+        xml = lxml.etree.Element("ASC_CDL")
+        self.write_process_node_attributes(xml)
+        xml.set("style", self.style.value)
+        if self.sopnode is not None:
+            xml.append(self.sopnode.to_xml())
+        if self.sat_node is not None:
+            xml.append(self.sat_node.to_xml())
+        return xml

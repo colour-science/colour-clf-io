@@ -1,6 +1,6 @@
 [project]
 name = "colour-clf-io"
-version = "0.1.1"
+version = "0.2.0"
 description = "Library to parse and create file in the Common LUT format"
 readme = "README.rst"
 requires-python = ">=3.10,<3.14"
@@ -49,6 +49,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+processing = [
+    "colour-science>=0.4.6",
+]
 docs = [
     "biblib-simple",
     "pydata-sphinx-theme",
@@ -73,7 +76,8 @@ dev-dependencies = [
     "toml",
     "twine",
     # Package Specific
-    "lxml-stubs>=0.5.1,<0.6"
+    "lxml-stubs",
+    "opencolorio>=2,<3",
 ]
 
 [build-system]
@@ -148,6 +152,7 @@ ignore = [
     "RUF022", # [*] `__all__` is not sorted
     "TRY003", # Avoid specifying long messages outside the exception class
     "UP038", #  Use `X | Y` in `isinstance` call instead of `(X, Y)`
+    "S320", # Lint is deprecated and will be removed from future ruff versions.
 ]
 typing-modules = []
 
@@ -156,7 +161,6 @@ convention = "numpy"
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["D104"]
-"colour_hdri/examples/*" = ["INP", "T201", "T203"]
 "docs/*" = ["INP"]
 "tasks.py" = ["INP"]
 "test_*" = ["S101"]
