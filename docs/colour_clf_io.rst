@@ -11,7 +11,7 @@ Reading and Writing CLF Files
 .. autosummary::
     :toctree: generated/
 
-    read_clf
+    read_clf_from_file
     read_clf
     write_clf
 
