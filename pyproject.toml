@@ -43,7 +43,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy>=1.24,<3",
+    "numpy>=2.0.0,<3",
     "typing-extensions>=4,<5",
     "lxml>=5.2.1,<6",
 ]
