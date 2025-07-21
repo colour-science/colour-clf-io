@@ -687,7 +687,7 @@ class TestParseCLF:
         Test parsing of a *CLF* file written by OpenColorIO.
         """
 
-        import PyOpenColorIO as ocio
+        import PyOpenColorIO as ocio  # noqa: PLC0415
 
         ocio_transform = (
             ocio.Config()  # pyright: ignore[reportAttributeAccessIssue]

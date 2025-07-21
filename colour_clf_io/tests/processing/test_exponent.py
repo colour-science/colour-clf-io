@@ -17,7 +17,7 @@ from colour_clf_io.tests.processing.test_common import (
 
 def assert_snippet_consistency(snippet: str) -> None:
     """
-    Evaluate the snippet with multiple values anc check that they are the same as the
+    Evaluate the snippet with multiple values and check that they are the same as the
     `ociochecklut` tools output.
     """
     for rgb in rgb_sample_iter():
