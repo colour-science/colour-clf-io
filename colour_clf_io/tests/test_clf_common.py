@@ -191,7 +191,8 @@ def validate_clf_schema_smtp_st2136_1(doc: str) -> ValidationResult:
     :class:`bool`
         Whether the document is valid according to the schema.
     """
-    import pytest
+
+    import pytest  # noqa: PLC0415
 
     if not st2136_1a_202x_schema_available():
         pytest.skip("Schema not available for validation.")

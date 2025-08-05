@@ -66,7 +66,8 @@ def ocio_output_for_file(
     """Apply a color transform file to a flattened, one-dimensional list of
     R,G,B values.
     """
-    import PyOpenColorIO as ocio
+
+    import PyOpenColorIO as ocio  # noqa: PLC0415
 
     xform = ocio.FileTransform(src=path)  # pyright: ignore[reportAttributeAccessIssue]
     cpu = ocio.GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()  # pyright: ignore[reportAttributeAccessIssue]

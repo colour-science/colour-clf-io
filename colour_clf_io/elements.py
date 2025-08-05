@@ -176,7 +176,7 @@ class Array(XMLParsable, XMLWritable):
             Array of shape `dim` with the data from `values`.
         """
 
-        import numpy as np
+        import numpy as np  # noqa: PLC0415
 
         dim = self.dim
         # Strip the dimensions with value 1.
