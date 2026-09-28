@@ -7,10 +7,10 @@ Defines the top level *ProcessList* object that represents a *CLF* process.
 
 from __future__ import annotations
 
+from _warnings import warn
 from dataclasses import dataclass
 
 import lxml.etree
-from _warnings import warn
 
 from colour_clf_io.elements import Info
 from colour_clf_io.errors import ParsingError
