@@ -174,7 +174,7 @@ def write_clf(
     process_list: ProcessList,
     path: str | Path | None = None,
     namespace: Namespaces = Namespaces.AMPAS,
-) -> None | str:
+) -> str | None:
     """
     Write the given *ProcessList* as a CLF file to the target
     location. If no *path* is given the CLF document will be returned as a string.
