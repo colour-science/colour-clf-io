@@ -1,9 +1,9 @@
 [project]
 name = "colour-clf-io"
-version = "0.2.0"
+version = "0.2.1"
 description = "Library to parse and create file in the Common LUT format"
 readme = "README.rst"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.13,<3.16"
 authors = [
     { name = "Colour Developers", email = "colour-developers@colour-science.org" },
 ]
@@ -43,14 +43,14 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy>=2.0.0,<3",
+    "numpy>=2.2,<3",
     "typing-extensions>=4,<5",
-    "lxml>=5.2.1,<6",
+    "lxml>=5.2.1,<7",
 ]
 
 [project.optional-dependencies]
 processing = [
-    "colour-science>=0.4.6",
+    "colour-science>=0.4.7",
 ]
 docs = [
     "biblib-simple",
@@ -62,6 +62,9 @@ docs = [
 
 [tool.uv]
 package = true
+
+[tool.uv.sources]
+colour-science = { git = "https://github.com/colour-science/colour.git", branch = "feature/array-api-review" }
 
 [dependency-groups]
 dev = [
@@ -79,7 +82,7 @@ dev = [
     "twine",
     # Package Specific
     "lxml-stubs",
-    "opencolorio>=2,<3",
+    "opencolorio>=2,<3; python_version < '3.14'",
 ]
 
 [build-system]
@@ -115,7 +118,7 @@ reportUnusedExpression = false
 addopts = "--durations=5"
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py313"
 line-length = 88
 select = ["ALL"]
 ignore = [
@@ -154,6 +157,9 @@ ignore = [
     "RUF022", # [*] `__all__` is not sorted
     "TRY003", # Avoid specifying long messages outside the exception class
     "UP038", #  Use `X | Y` in `isinstance` call instead of `(X, Y)`
+    "UP040", # Preserve runtime-compatible type aliases
+    "UP043", # Keep explicit default type arguments
+    "UP047", # Preserve TypeVar-based generic functions
     "S320", # Lint is deprecated and will be removed from future ruff versions.
 ]
 typing-modules = []
