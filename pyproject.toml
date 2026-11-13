@@ -82,7 +82,7 @@ dev = [
     "twine",
     # Package Specific
     "lxml-stubs",
-    "opencolorio>=2,<3; python_version < '3.14'",
+    "opencolorio>=2,<3; python_version < '3.15'",
 ]
 
 [build-system]
