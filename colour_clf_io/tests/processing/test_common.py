@@ -8,6 +8,7 @@ from collections.abc import Generator
 from typing import Any
 
 import numpy as np
+import pytest
 from colour.hints import NDArrayFloat
 from colour.io.luts import AbstractLUTSequenceOperator
 
@@ -67,10 +68,12 @@ def ocio_output_for_file(
     R,G,B values.
     """
 
-    import PyOpenColorIO as ocio  # noqa: PLC0415
+    ocio = pytest.importorskip(
+        "PyOpenColorIO", reason="OpenColorIO is unavailable for this Python version"
+    )
 
-    xform = ocio.FileTransform(src=path)  # pyright: ignore[reportAttributeAccessIssue]
-    cpu = ocio.GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()  # pyright: ignore[reportAttributeAccessIssue]
+    xform = ocio.FileTransform(src=path)
+    cpu = ocio.GetCurrentConfig().getProcessor(xform).getDefaultCPUProcessor()
     result = cpu.applyRGB(rgb)
     # Note: depending on the input, `applyRGB` will either return the result data, or
     # modify the data in place. If the return value was `None` the data was modified

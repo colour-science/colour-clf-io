@@ -8,9 +8,9 @@ typically are child elements of *Process* Nodes.
 
 from __future__ import annotations
 
-import sys
 import typing
 from dataclasses import dataclass
+from itertools import batched
 
 if typing.TYPE_CHECKING:
     import numpy.typing as npt
@@ -50,21 +50,6 @@ __all__ = [
     "LogParams",
     "ExponentParams",
 ]
-
-if sys.version_info >= (3, 12):
-    from itertools import batched
-else:
-    from itertools import islice
-
-    T = typing.TypeVar("T")
-
-    def batched(iterable: typing.Iterable[T], n: int) -> typing.Iterator[tuple[T, ...]]:
-        if n < 1:
-            err = "n must be at least one"
-            raise ValueError(err)
-        it = iter(iterable)
-        while batch := tuple(islice(it, n)):
-            yield batch
 
 
 @dataclass
@@ -161,7 +146,8 @@ class Array(XMLParsable, XMLWritable):
         else:
             row_length = self.dim[-1]
             text = "\n".join(
-                " ".join(map(str, row)) for row in batched(self.values, row_length)
+                " ".join(map(str, row))
+                for row in batched(self.values, row_length, strict=False)
             )
         xml.text = wrap_with_newlines(text)
         return xml
